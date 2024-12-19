@@ -9,7 +9,7 @@ objects = soundkit.o
 ${TARGET}: ${objects}
 	${CC} ${CFLAGS} -o ${TARGET} ${objects} ${LDFLAGS}
 
-soundkit.o: sample.h miniaudio/miniaudio.h
+soundkit.o: miniaudio/miniaudio.h
 
 .PHONY: clean install
 clean:
