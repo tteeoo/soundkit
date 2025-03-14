@@ -4,16 +4,15 @@ LDFLAGS = -ldl -lpthread -lm
 TARGET = soundkit
 PREFIX = /usr/local
 
-objects = soundkit.o
+.PHONY: toolchain
+toolchain: bin/2files
 
-${TARGET}: ${objects}
-	${CC} ${CFLAGS} -o ${TARGET} ${objects} ${LDFLAGS}
+bin/2files: miniaudio/miniaudio.h bin
+	${CC} ${CFLAGS} -o bin/2files src/2files.c
 
-soundkit.o: miniaudio/miniaudio.h
+bin:
+	mkdir bin
 
-.PHONY: clean install
+.PHONY: clean
 clean:
-	rm -f ${objects} ${TARGET}
-
-install: ${TARGET}
-	cp ${TARGET} ${PREFIX}/bin/
+	rm -f bin/* src/*.o
