@@ -1,6 +1,8 @@
+#!/usr/bin/python3
+
 import matplotlib.pyplot as plt
 
-FILE_PATH = 'wave.pcm.txt'
+FILE_PATH = 'share/wave.txt'
 
 with open(FILE_PATH, 'r') as file:
     y_values = [float(line.strip()) for line in file]
