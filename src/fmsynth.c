@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
 	// TODO: input validation
 	modWaveConfig = cmads_modwave_config_init(device.playback.format, device.playback.channels, device.sampleRate, ma_waveform_type_sine,
-			atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 	cmads_modwave_init(&modWaveConfig, &modWave);
 
 	if (ma_device_start(&device) != MA_SUCCESS) {
