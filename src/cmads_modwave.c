@@ -3,6 +3,7 @@
 #include "../miniaudio/miniaudio.h"
 
 // TODO: separate out header file, have Makefile use object
+// should these be static?
 
 //
 // Struct definitions
@@ -30,24 +31,22 @@ typedef struct {
 // 
 
 // Helper wave function
-static float cmads_sinf(double time, double frequency, double phase, double amplitude) {
+static float modwave_sinf(double time, double frequency, double phase, double amplitude) {
 	return (float)(ma_sind(MA_TAU_D * frequency * time + phase) * amplitude);
 }
 
 static void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
-	ma_uint64 iFrame;
-	ma_uint64 iChannel;
 
-	MA_ASSERT(pModWave  != NULL);
+	MA_ASSERT(pModWave != NULL);
 	MA_ASSERT(pFramesOut != NULL);
 
 	// TODO other formats?
 	if (pModWave->config.format == ma_format_f32) {
 		float* pFramesOutF32 = (float*)pFramesOut;
-		for (iFrame = 0; iFrame < frameCount; iFrame += 1) {
-			float s = cmads_sinf(pModWave->time, pModWave->config.cfrequency,
-				cmads_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
-			for (iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
+		for (ma_unit64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
+			float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
+				modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
+			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
 				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
 			// TODO manage output
 			if (!isatty(1))
@@ -56,6 +55,9 @@ static void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFrames
 			pModWave->time += 1.0 / pModWave->config.sampleRate;
 		}
 	}
+
+	if (pFramesRead != NULL)
+		*pFramesRead = frameCount;
 }
 
 static void cmads_modwave_seek_to_pcm_frame(cmads_modwave* pModWave, ma_uint64 frameIndex) {
