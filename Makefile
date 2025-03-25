@@ -5,12 +5,12 @@ TARGET = soundkit
 PREFIX = /usr/local
 
 .PHONY: toolchain
-toolchain: sk.2files sk.fmsynth
+toolchain: sk.playback sk.fmsynth
 
 sk.fmsynth: miniaudio/miniaudio.h src/fmsynth.c src/cmads_modwave.c
 	${CC} ${CFLAGS} -o sk.fmsynth src/fmsynth.c
-sk.2files: miniaudio/miniaudio.h src/2files.c 
-	${CC} ${CFLAGS} -o sk.2files src/2files.c
+sk.playback: miniaudio/miniaudio.h src/playback.c src/cmads_stdins.c
+	${CC} ${CFLAGS} -o sk.playback src/playback.c
 
 .PHONY: clean
 clean:

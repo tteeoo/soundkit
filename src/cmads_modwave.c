@@ -43,14 +43,15 @@ static void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFrames
 	// TODO other formats?
 	if (pModWave->config.format == ma_format_f32) {
 		float* pFramesOutF32 = (float*)pFramesOut;
-		for (ma_unit64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
+		for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 			float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
 				modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
-			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
+			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1) {
 				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
-			// TODO manage output
-			if (!isatty(1))
-				printf("%f\n", s);
+				// TODO manage output
+				if (!isatty(1))
+					write(1, &s, sizeof(float));
+			}
 
 			pModWave->time += 1.0 / pModWave->config.sampleRate;
 		}
@@ -135,14 +136,14 @@ ma_result cmads_modwave_init(cmads_modwave_config* pConfig, cmads_modwave* pModW
 	baseConfig = ma_data_source_config_init();
 	baseConfig.vtable = &g_cmads_modwave_vtable;
 
+	MA_ZERO_OBJECT(pModWave);
+
 	result = ma_data_source_init(&baseConfig, &pModWave->base);
 	if (result != MA_SUCCESS)
 		return result;
 
 	if (pModWave == NULL)
 		return MA_INVALID_ARGS;
-
-	MA_ZERO_OBJECT(pModWave);
 
 	pModWave->config = *pConfig;
 	pModWave->time = 0;
