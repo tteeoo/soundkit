@@ -46,12 +46,8 @@ static void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFrames
 		for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 			float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
 				modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
-			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1) {
+			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
 				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
-				// TODO manage output
-				if (!isatty(1))
-					write(1, &s, sizeof(float));
-			}
 
 			pModWave->time += 1.0 / pModWave->config.sampleRate;
 		}

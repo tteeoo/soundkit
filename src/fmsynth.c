@@ -51,17 +51,23 @@ int main(int argc, char** argv) {
 			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 	cmads_modwave_init(&modWaveConfig, &modWave);
 
-	if (ma_device_start(&device) != MA_SUCCESS) {
-		if (isatty(1)) 
-			printf("Failed to start playback device.\n");
-		ma_device_uninit(&device);
-		return -5;
+	// TODO: use device for playback if stdout is a tty
+	/*if (ma_device_start(&device) != MA_SUCCESS) {*/
+	/*	if (isatty(1)) */
+	/*		printf("Failed to start playback device.\n");*/
+	/*	ma_device_uninit(&device);*/
+	/*	return -5;*/
+	/*}*/
+
+	float s[DEVICE_CHANNELS];
+	while (1) {
+		cmads_modwave_read_pcm_frames(&modWave, s, 1, NULL);
+		write(1, &s, sizeof(float) * DEVICE_CHANNELS);
+		sleep(1 / DEVICE_SAMPLE_RATE);
 	}
     
 	if (isatty(1))
 		printf("Press key to quit...\n");
-
-	getchar();
 
 	ma_device_uninit(&device);
 	cmads_modwave_uninit(&modWave);
