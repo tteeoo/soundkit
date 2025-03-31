@@ -1,17 +1,21 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -Wextra -std=c11 -g
 LDFLAGS = -ldl -lpthread -lm
-TARGET = soundkit
-PREFIX = /usr/local
 
-.PHONY: toolchain
-toolchain: sk.playback sk.fmsynth
+TOOL_SOURCES = $(wildcard src/*.tool.c)
+TOOL_EXECS = $(TOOL_SOURCES:src/%.tool.c=build/sk.%)
 
-sk.fmsynth: miniaudio/miniaudio.h src/fmsynth.c src/cmads_modwave.c
-	${CC} ${CFLAGS} -o sk.fmsynth src/fmsynth.c
-sk.playback: miniaudio/miniaudio.h src/playback.c src/cmads_stdins.c
-	${CC} ${CFLAGS} -o sk.playback src/playback.c
+.PHONY: all toolchain clean
 
-.PHONY: clean
+all: toolchain
+
+toolchain: $(TOOL_EXECS)
+
+$(TOOL_EXECS): build/sk.% : src/%.tool.c | build
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+build:
+	mkdir -p build
+
 clean:
-	rm -f sk.* src/*.o
+	rm -rf build src/*.o

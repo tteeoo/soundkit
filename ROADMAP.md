@@ -1,4 +1,6 @@
 - LPF module
+- Toolchain config header file
+- Separate cmads into header files?
 - Decoder module
 - Encoder module
 - Waveform viewing
