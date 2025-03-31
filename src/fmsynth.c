@@ -58,12 +58,16 @@ int main(int argc, char** argv) {
 	/*	ma_device_uninit(&device);*/
 	/*	return -5;*/
 	/*}*/
+	ma_lpf2_config lpfConfig = ma_lpf2_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, DEVICE_SAMPLE_RATE, 100, 10);
+	ma_lpf2 lpf;
+	ma_lpf2_init(&lpfConfig, NULL, &lpf);
 
-	float s[DEVICE_CHANNELS];
+	float s[DEVICE_CHANNELS * 100];
 	while (1) {
-		cmads_modwave_read_pcm_frames(&modWave, s, 1, NULL);
-		write(1, &s, sizeof(float) * DEVICE_CHANNELS);
-		sleep(1 / DEVICE_SAMPLE_RATE);
+		cmads_modwave_read_pcm_frames(&modWave, s, 100, NULL);
+		ma_lpf2_process_pcm_frames(&lpf, &s, &s, 100);
+		write(1, &s, 100 * sizeof(float) * DEVICE_CHANNELS);
+		sleep(100 / DEVICE_SAMPLE_RATE);
 	}
     
 	if (isatty(1))
