@@ -11,11 +11,11 @@ all: toolchain
 
 toolchain: $(TOOL_EXECS)
 
-src/fmsynth.tool.c: src/cmads_modwave.c
-src/playback.tool.c src/delay.tool.c: src/cmads_modwave.c
+build/sk.fmsynth: src/cmads_modwave.c
+build/sk.playback build/sk.delay: src/cmads_stdins.c
 
 $(TOOL_EXECS): build/sk.% : src/%.tool.c | build
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
 build:
 	mkdir -p build
