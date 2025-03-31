@@ -46,23 +46,23 @@ static ma_result cmads_stdins_on_read(ma_data_source* pDataSource, void* pFrames
 	return MA_SUCCESS;
 }
 
-static ma_result cmads_stdins_on_seek(ma_data_source* pDataSource, ma_uint64 frameIndex) {
-	// Seek to a specific PCM frame here. Return MA_NOT_IMPLEMENTED if seeking is not supported.
-}
-
 static ma_result cmads_stdins_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap) {
-	// Return the format of the data here.
-}
 
-static ma_result cmads_stdins_on_get_cursor(ma_data_source* pDataSource, ma_uint64* pCursor) {
-	// Retrieve the current position of the cursor here. Return MA_NOT_IMPLEMENTED and set *pCursor to 0 if there is no notion of a cursor.
+	cmads_stdins* pStdins = (cmads_stdins*)pDataSource;
+
+	*pFormat = pStdins->config.format;
+	*pChannels = pStdins->config.channels;
+	*pSampleRate = pStdins->config.sampleRate;
+	ma_channel_map_init_standard(ma_standard_channel_map_default, pChannelMap, channelMapCap, pStdins->config.channels);
+
+	return MA_SUCCESS;
 }
 
 static ma_data_source_vtable g_cmads_stdins_vtable = {
 	cmads_stdins_on_read,
-	cmads_stdins_on_seek,
+	NULL, // No seek
 	cmads_stdins_on_get_data_format,
-	cmads_stdins_on_get_cursor,
+	NULL, // No cursor
 	NULL, // No get_length
 	NULL, // No set_looping
 	0

@@ -22,6 +22,8 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 	
 	if (!isatty(1))
 		write(1, pOutput, frameCount * sizeof(float) * CHANNELS);
+
+	(void)pInput;
 }
 
 int main(int argc, char** argv) {
@@ -60,6 +62,8 @@ int main(int argc, char** argv) {
 
 	ma_device_uninit(&device);
 	cmads_stdins_uninit(&stdins);
-    
+
+	(void)argc;
+	(void)argv;
 	return 0;
 }
