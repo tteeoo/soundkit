@@ -81,7 +81,6 @@ int main(int argc, char** argv) {
 			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 	cmads_modwave_init(&modWaveConfig, &modWave);
 
-	// TODO: playback with forwarding
 	if (isatty(1))
 		playback_data(modWave);
 	else
