@@ -1,11 +1,17 @@
 - LPF module
-- Toolchain config header file
-- Separate cmads into header files?
 - Decoder module
 - Encoder module
-- Waveform viewing
+- Waveform modules
+- Waveform view module
+
+- Toolchain config header file
+- Separate cmads into header files?
+
 - Sequencer
-- Better module command interface
+
+- Volume control for each module
+
+- FM Synth waveform specification
 
 Thinking about further development: a daemon to facilitate IPC: runtime updating of effects,
     ability to set up multiple input streams for a merger process, creation of a format to specify

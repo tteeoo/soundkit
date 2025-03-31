@@ -11,10 +11,10 @@ modules
 -------
 
 Sources:
-* fmsynth
+* fmsynth <carrier amplitude> <modulator amplitude> <carrier frq> <modulator frq>
 
 Intermediaries:
-* delay
+* delay <seconds> <decay>
 
 Finality:
 * playback
