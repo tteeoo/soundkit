@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	cmads_stdins stdins;
 	cmads_stdins_config stdinsConfig;
 
-	delayConfig = ma_delay_config_init(CHANNELS, SAMPLE_RATE, (ma_uint32)(SAMPLE_RATE * atoi(argv[1])), atof(argv[2]));
+	delayConfig = ma_delay_config_init(CHANNELS, SAMPLE_RATE, (ma_uint32)(SAMPLE_RATE * atof(argv[1])), atof(argv[2]));
 	ma_delay_init(&delayConfig, NULL, &delay);
 	stdinsConfig = cmads_stdins_config_init(FORMAT, CHANNELS, SAMPLE_RATE);
 	cmads_stdins_init(&stdinsConfig, &stdins);
