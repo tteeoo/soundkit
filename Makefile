@@ -11,6 +11,9 @@ all: toolchain
 
 toolchain: $(TOOL_EXECS)
 
+src/fmsynth.tool.c: src/cmads_modwave.c
+src/playback.tool.c src/delay.tool.c: src/cmads_modwave.c
+
 $(TOOL_EXECS): build/sk.% : src/%.tool.c | build
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 

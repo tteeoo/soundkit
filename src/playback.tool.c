@@ -8,13 +8,13 @@
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
-#define DEVICE_FORMAT       ma_format_f32
-#define DEVICE_CHANNELS     2
-#define DEVICE_SAMPLE_RATE  48000
+#define FORMAT       ma_format_f32
+#define CHANNELS     2
+#define SAMPLE_RATE  48000
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 
-	MA_ASSERT(pDevice->playback.channels == DEVICE_CHANNELS);
+	MA_ASSERT(pDevice->playback.channels == CHANNELS);
 
 	MA_ASSERT(pDevice->pUserData != NULL);
 
@@ -29,9 +29,9 @@ int main(int argc, char** argv) {
 	cmads_stdins_config stdinsConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
-	deviceConfig.playback.format   = DEVICE_FORMAT;
-	deviceConfig.playback.channels = DEVICE_CHANNELS;
-	deviceConfig.sampleRate        = DEVICE_SAMPLE_RATE;
+	deviceConfig.playback.format   = FORMAT;
+	deviceConfig.playback.channels = CHANNELS;
+	deviceConfig.sampleRate        = SAMPLE_RATE;
 	deviceConfig.dataCallback      = data_callback;
 	deviceConfig.pUserData         = &stdins;
 

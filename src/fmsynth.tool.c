@@ -8,13 +8,14 @@
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
-#define DEVICE_FORMAT       ma_format_f32
-#define DEVICE_CHANNELS     2
-#define DEVICE_SAMPLE_RATE  48000
+#define FORMAT       ma_format_f32
+#define CHANNELS     2
+#define SAMPLE_RATE  48000
+#define BATCH_SIZE   100
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 
-	MA_ASSERT(pDevice->playback.channels == DEVICE_CHANNELS);
+	MA_ASSERT(pDevice->playback.channels == CHANNELS);
 
 	cmads_modwave* pModWave = (cmads_modwave*)pDevice->pUserData;
 	MA_ASSERT(pModWave != NULL);
@@ -28,9 +29,9 @@ ma_result playback_data(cmads_modwave modWave) {
 	ma_device_config deviceConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
-	deviceConfig.playback.format   = DEVICE_FORMAT;
-	deviceConfig.playback.channels = DEVICE_CHANNELS;
-	deviceConfig.sampleRate        = DEVICE_SAMPLE_RATE;
+	deviceConfig.playback.format   = FORMAT;
+	deviceConfig.playback.channels = CHANNELS;
+	deviceConfig.sampleRate        = SAMPLE_RATE;
 	deviceConfig.dataCallback      = data_callback;
 	deviceConfig.pUserData         = &modWave;
 
@@ -60,11 +61,11 @@ ma_result playback_data(cmads_modwave modWave) {
 
 ma_result forward_data(cmads_modwave modWave) {
 
-	float s[DEVICE_CHANNELS * 100];
+	float s[CHANNELS * BATCH_SIZE];
 	while (1) {
-		cmads_modwave_read_pcm_frames(&modWave, s, 100, NULL);
-		write(1, &s, 100 * sizeof(float) * DEVICE_CHANNELS);
-		sleep(100 / DEVICE_SAMPLE_RATE);
+		cmads_modwave_read_pcm_frames(&modWave, s, BATCH_SIZE, NULL);
+		write(1, &s, BATCH_SIZE * sizeof(float) * CHANNELS);
+		sleep(BATCH_SIZE / SAMPLE_RATE);
 	}
 
 	return MA_SUCCESS;
@@ -76,7 +77,7 @@ int main(int argc, char** argv) {
 	cmads_modwave_config modWaveConfig;
 
 	// TODO: input validation
-	modWaveConfig = cmads_modwave_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, DEVICE_SAMPLE_RATE, ma_waveform_type_sine,
+	modWaveConfig = cmads_modwave_config_init(FORMAT, CHANNELS, SAMPLE_RATE, ma_waveform_type_sine,
 			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 	cmads_modwave_init(&modWaveConfig, &modWave);
 
