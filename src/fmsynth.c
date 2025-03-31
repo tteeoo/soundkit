@@ -22,14 +22,10 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 	cmads_modwave_read_pcm_frames(pModWave, pOutput, frameCount, NULL);
 }
 
-int main(int argc, char** argv) {
-
-	// TODO manage sound playback based on output streams and options
+ma_result playback_data(cmads_modwave modWave) {
 
 	ma_device device;
 	ma_device_config deviceConfig;
-	cmads_modwave modWave;
-	cmads_modwave_config modWaveConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
 	deviceConfig.playback.format   = DEVICE_FORMAT;
@@ -46,34 +42,50 @@ int main(int argc, char** argv) {
 	if (isatty(1))
 		printf("Device Name: %s\n", device.playback.name);
 
-	// TODO: input validation
-	modWaveConfig = cmads_modwave_config_init(device.playback.format, device.playback.channels, device.sampleRate, ma_waveform_type_sine,
-			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
-	cmads_modwave_init(&modWaveConfig, &modWave);
+	if (ma_device_start(&device) != MA_SUCCESS) {
+		if (isatty(1)) 
+			printf("Failed to start playback device.\n");
+		ma_device_uninit(&device);
+		return -5;
+	}
 
-	// TODO: use device for playback if stdout is a tty
-	/*if (ma_device_start(&device) != MA_SUCCESS) {*/
-	/*	if (isatty(1)) */
-	/*		printf("Failed to start playback device.\n");*/
-	/*	ma_device_uninit(&device);*/
-	/*	return -5;*/
-	/*}*/
-	ma_lpf2_config lpfConfig = ma_lpf2_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, DEVICE_SAMPLE_RATE, 100, 10);
-	ma_lpf2 lpf;
-	ma_lpf2_init(&lpfConfig, NULL, &lpf);
+	if (isatty(1))
+		printf("Press key to quit...\n");
+	getchar();
+
+	ma_device_uninit(&device);
+
+	return MA_SUCCESS;
+}
+
+ma_result forward_data(cmads_modwave modWave) {
 
 	float s[DEVICE_CHANNELS * 100];
 	while (1) {
 		cmads_modwave_read_pcm_frames(&modWave, s, 100, NULL);
-		ma_lpf2_process_pcm_frames(&lpf, &s, &s, 100);
 		write(1, &s, 100 * sizeof(float) * DEVICE_CHANNELS);
 		sleep(100 / DEVICE_SAMPLE_RATE);
 	}
-    
-	if (isatty(1))
-		printf("Press key to quit...\n");
 
-	ma_device_uninit(&device);
+	return MA_SUCCESS;
+}
+
+int main(int argc, char** argv) {
+
+	cmads_modwave modWave;
+	cmads_modwave_config modWaveConfig;
+
+	// TODO: input validation
+	modWaveConfig = cmads_modwave_config_init(DEVICE_FORMAT, DEVICE_CHANNELS, DEVICE_SAMPLE_RATE, ma_waveform_type_sine,
+			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
+	cmads_modwave_init(&modWaveConfig, &modWave);
+
+	// TODO: playback with forwarding
+	if (isatty(1))
+		playback_data(modWave);
+	else
+		forward_data(modWave);
+    
 	cmads_modwave_uninit(&modWave);
     
 	return 0;
