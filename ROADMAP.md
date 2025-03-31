@@ -1,5 +1,9 @@
-- Write pcm to stdout, or playback sound, based on if stdout is tty
-- stdin data source
+- LPF module
+- Decoder module
+- Encoder module
+- Waveform viewing
+- Sequencer
+- Better module command interface
 
 Thinking about further development: a daemon to facilitate IPC: runtime updating of effects,
     ability to set up multiple input streams for a merger process, creation of a format to specify
