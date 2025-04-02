@@ -12,7 +12,7 @@ all: toolchain
 toolchain: $(TOOL_EXECS)
 
 build/sk.fmsynth: src/cmads_modwave.c
-build/sk.playback build/sk.delay build/sk.lpf: src/cmads_stdins.c
+build/sk.playback build/sk.delay build/sk.lpf build/sk.hpf: src/cmads_stdins.c
 
 $(TOOL_EXECS): build/sk.% : src/%.tool.c | build
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
