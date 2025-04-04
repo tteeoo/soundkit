@@ -6,6 +6,7 @@
 	- Waveforms
 
 - Sequencer
+	- Format: define commands (sounds) as characters, make text character grid of tracks and sounds
 
 - Arguments (argp)
 	- Volume control for each module
