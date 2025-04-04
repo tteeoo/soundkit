@@ -1,28 +1,57 @@
 CC      := gcc
-CFLAGS  := -Wall -Wextra -std=c11 -g
+CFLAGS  := -Wall -Wextra -std=c11
 LDFLAGS := -ldl -lpthread -lm
 
 SDL_CFLAGS  := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
-TOOL_SOURCES := $(wildcard src/*.tool.c)
-TOOL_EXECS   := $(TOOL_SOURCES:src/%.tool.c=build/sk.%)
+CMADS_SRCS := $(wildcard src/cmads_*.c)
+CMADS_OBJS := $(CMADS_SRCS:src/%.c=src/%.o)
 
-.PHONY: all toolchain clean
+TOOL_SRCS  := $(wildcard src/*.tool.c)
+TOOL_OBJS  := $(TOOL_SRCS:src/%.tool.c=src/%.tool.o)
+TOOL_EXECS := $(TOOL_SRCS:src/%.tool.c=build/sk.%)
+
+.PHONY: all toolchain debug clean
 
 all: toolchain
 
+debug: CFLAGS += -DDEBUG -g
+debug: all
+
+# Generic module object
+src/generic_module.o: src/generic_module.c src/generic_module.h | build
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Custom miniaudio data source generic compilation
+$(CMADS_OBJS): src/%.o : src/%.c src/%.h | build
+	$(CC) $(CFLAGS) -c $< -o $@
+
+#
+# Toolchain
+#
 toolchain: $(TOOL_EXECS) build/sk.view
 
-build/sk.fmsynth: src/cmads_modwave.c
-build/sk.playback build/sk.delay build/sk.lpf build/sk.hpf: src/cmads_stdins.c
+# Specific tool dependencies
+build/sk.fmsynth: src/cmads_modwave.o src/generic_module.o
+build/sk.playback build/sk.delay build/sk.lpf build/sk.hpf build/sk.encode: src/cmads_stdins.o
 
-$(TOOL_EXECS): build/sk.% : src/%.tool.c | build
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+# Generic compilation
+$(TOOL_OBJS): src/%.tool.o : src/%.tool.c | build
+	$(CC) $(CFLAGS) -c $^ -o $@
+$(TOOL_EXECS): build/sk.% : src/%.tool.o | build
+	$(CC) $(LDFLAGS) $^ -o $@ 
 
-build/sk.view: src/view.tool.sdl.c src/cmads_stdins.c | build
-	$(CC) $(CFLAGS) $(SDL_CFLAGS) $< -o $@ $(LDFLAGS) $(SDL_LDFLAGS)
+# Special handling for SDL requirement
+src/sk.view.tool.sdl.o: src/view.tool.sdl.c | build
+	$(CC) $(CFLAGS) $(SDL_CFLAGS) -c $^ -o $@
+build/sk.view: src/sk.view.tool.sdl.o src/cmads_stdins.o | build
+	$(CC) $(LDFLAGS) $(SDL_LDFLAGS) $^ -o $@
 
+
+#
+# Misc.
+#
 build:
 	mkdir -p build
 

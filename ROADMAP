@@ -1,16 +1,19 @@
-- Decoder module
-- Encoder module
-- Waveform modules
+- Make generic module have ability for processing
 
-- Toolchain config header file
-- Separate cmads into header files?
+- Modules
+	- Encoder
+	- Decoder 
+	- Waveforms
 
 - Sequencer
 
-- Volume control for each module
+- Arguments (argp)
+	- Volume control for each module
+	- Channel control for each module
+	- Lifetime control for each module
+	- FM Synth waveform specification
 
-- FM Synth waveform specification
-
-Thinking about further development: a daemon to facilitate IPC: runtime updating of effects,
-    ability to set up multiple input streams for a merger process, creation of a format to specify
-    process configurations
+- IPC daemon
+	- runtime updating of effects,
+	- ability to set up multiple input streams for a merge module
+	- creation of a config format to specify process configurations

@@ -4,10 +4,9 @@
 
 #include <SDL.h>
 
+#include "cmads_stdins.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
-
-#include "cmads_stdins.c"
 
 #define WIDTH        800
 #define HEIGHT       400

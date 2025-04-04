@@ -1,30 +1,8 @@
-#include <unistd.h>
+#include <math.h>
 
+#include "cmads_modwave.h"
+#undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
-
-// TODO: separate out header file, have Makefile use object
-// should these be static?
-
-//
-// Struct definitions
-//
-typedef struct {
-	ma_format format;
-	ma_uint32 channels;
-	ma_uint32 sampleRate;
-	ma_waveform_type type; // TODO: use mtype and ctype for waves
-	double camplitude;
-	double mamplitude;
-	double cfrequency;
-	double mfrequency;
-} cmads_modwave_config;
-
-typedef struct {
-	ma_data_source_base base;
-	cmads_modwave_config config;
-	double time;
-} cmads_modwave;
-
 
 //
 // Direct modwave functions
@@ -32,32 +10,29 @@ typedef struct {
 
 // Helper wave function
 static float modwave_sinf(double time, double frequency, double phase, double amplitude) {
-	return (float)(ma_sind(MA_TAU_D * frequency * time + phase) * amplitude);
+	return (float)(sin(2 * M_PI * frequency * time + phase) * amplitude);
 }
 
-static void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
+void cmads_modwave_read_pcm_frames(cmads_modwave* pModWave, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
 
-	MA_ASSERT(pModWave != NULL);
-	MA_ASSERT(pFramesOut != NULL);
+	//MA_ASSERT(pModWave != NULL);
+	//MA_ASSERT(pFramesOut != NULL);
 
-	// TODO other formats?
-	if (pModWave->config.format == ma_format_f32) {
-		float* pFramesOutF32 = (float*)pFramesOut;
-		for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
-			float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
-				modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
-			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
-				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
+	float* pFramesOutF32 = (float*)pFramesOut;
+	for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
+		float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
+			modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
+		for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
+			pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
 
-			pModWave->time += 1.0 / pModWave->config.sampleRate;
-		}
+		pModWave->time += 1.0 / pModWave->config.sampleRate;
 	}
 
 	if (pFramesRead != NULL)
 		*pFramesRead = frameCount;
 }
 
-static void cmads_modwave_seek_to_pcm_frame(cmads_modwave* pModWave, ma_uint64 frameIndex) {
+void cmads_modwave_seek_to_pcm_frame(cmads_modwave* pModWave, ma_uint64 frameIndex) {
 	pModWave->time = (double)frameIndex / (double)pModWave->config.sampleRate;
 }
 
@@ -110,7 +85,7 @@ static ma_data_source_vtable g_cmads_modwave_vtable = {
 cmads_modwave_config cmads_modwave_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency) {
 
 	cmads_modwave_config config;
-	MA_ZERO_OBJECT(&config);
+	//MA_ZERO_OBJECT(&config);
 
 	config.format = format;
 	config.channels = channels;
@@ -132,7 +107,7 @@ ma_result cmads_modwave_init(cmads_modwave_config* pConfig, cmads_modwave* pModW
 	baseConfig = ma_data_source_config_init();
 	baseConfig.vtable = &g_cmads_modwave_vtable;
 
-	MA_ZERO_OBJECT(pModWave);
+	//MA_ZERO_OBJECT(pModWave);
 
 	result = ma_data_source_init(&baseConfig, &pModWave->base);
 	if (result != MA_SUCCESS)

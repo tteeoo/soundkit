@@ -1,30 +1,16 @@
 #include <unistd.h>
 
+#include "cmads_stdins.h"
+#undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
-
-
-//
-// Struct definitions
-//
-typedef struct {
-	ma_format format;
-	ma_uint32 channels;
-	ma_uint32 sampleRate;
-} cmads_stdins_config;
-
-typedef struct {
-	ma_data_source_base base;
-	cmads_stdins_config config;
-} cmads_stdins;
-
 
 //
 // vtable bindings
 //
 static ma_result cmads_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
 
-	MA_ASSERT(pDataSource != NULL);
-	MA_ASSERT(pFramesOut != NULL);
+	//MA_ASSERT(pDataSource != NULL);
+	//MA_ASSERT(pFramesOut != NULL);
 
 	cmads_stdins* pStdins = (cmads_stdins*)pDataSource;
 
@@ -74,7 +60,7 @@ static ma_data_source_vtable g_cmads_stdins_vtable = {
 cmads_stdins_config cmads_stdins_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate) {
 
 	cmads_stdins_config config;
-	MA_ZERO_OBJECT(&config);
+	//MA_ZERO_OBJECT(&config);
 
 	config.format = format;
 	config.channels = channels;
@@ -91,7 +77,7 @@ ma_result cmads_stdins_init(cmads_stdins_config* pConfig, cmads_stdins* pStdins)
 	baseConfig = ma_data_source_config_init();
 	baseConfig.vtable = &g_cmads_stdins_vtable;
 
-	MA_ZERO_OBJECT(pStdins);
+	//MA_ZERO_OBJECT(pStdins);
 
 	result = ma_data_source_init(&baseConfig, &pStdins->base);
 	if (result != MA_SUCCESS)

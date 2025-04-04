@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "cmads_stdins.h"
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
-
-#include "cmads_stdins.c"
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
