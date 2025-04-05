@@ -3,18 +3,17 @@
 - Modules
 	- Encoder
 	- Decoder 
-	- Waveforms
+	- Noise
 
 - Sequencer
 	- Format: define commands (sounds) as characters, make text character grid of tracks and sounds
 
-- Arguments (argp)
+- Arguments
 	- Volume control for each module
 	- Channel control for each module
 	- Lifetime control for each module
 	- FM Synth waveform specification
 
-- IPC daemon
-	- runtime updating of effects,
-	- ability to set up multiple input streams for a merge module
-	- creation of a config format to specify process configurations
+- IPC daemon?
+	- Runtime updating of effects
+	- Ability to set up multiple input streams for a merge module
