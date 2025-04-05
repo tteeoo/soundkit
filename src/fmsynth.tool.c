@@ -1,6 +1,7 @@
 #include "generic_module.h"
 #include "cmads_modwave.h"
 
+#define MA_NO_GENERATION
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
 #define MA_NO_ENGINE
