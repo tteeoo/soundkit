@@ -3,7 +3,6 @@
 - Modules
 	- Encoder
 	- Decoder 
-	- Noise
 
 - Sequencer
 	- Format: define commands (sounds) as characters, make text character grid of tracks and sounds
