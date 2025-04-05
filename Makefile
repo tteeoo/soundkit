@@ -11,18 +11,11 @@ LDFLAGS     := -ldl -lpthread -lm
 SDL_CFLAGS  := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
-# Command-line parser source code generated with getgenopt
-CMDLS_GGOS := $(wildcard src/*.ggo) 
-CMDLS_SRCS := $(CMDLS_GGOS:src/%.ggo=$(GEN_DIR)/%.cmdl.h) $(CMDLS_GGOS:src/%.ggo=$(GEN_DIR)/%.cmdl.c)
-
 # Tool binaries (that don't depend on SDL)
-TOOL_SRCS  := $(wildcard src/*.tool.c)
-TOOL_OBJS  := $(TOOL_SRCS:src/%.tool.c=$(OBJ_DIR)/%.tool.o)
-TOOL_EXECS := $(TOOL_SRCS:src/%.tool.c=$(BIN_DIR)/sk.%)
+TOOL_EXECS := $(patsubst src/%.tool.c,$(BIN_DIR)/sk.%,$(wildcard src/*.tool.c))
 
-# Non-tool objects (with self-named headers)
-EXTRA_SRCS := $(wildcard src/cmads_*.c) src/generic_module.c
-EXTRA_OBJS := $(EXTRA_SRCS:src/%.c=$(OBJ_DIR)/%.o)
+# Specify non-tool, non-command parser objects (with self-named headers)
+EXTRA_OBJS := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(wildcard src/cmads_*.c)) $(OBJ_DIR)/generic_module.o
 
 # Default to toolchain
 .PHONY:
@@ -66,7 +59,7 @@ $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/cmads_modwave.o $(OBJ_DIR)/generic_module.o
 $(BIN_DIR)/sk.playback $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf $(BIN_DIR)/sk.encode: $(OBJ_DIR)/cmads_stdins.o
 
 # Generic tool compilation
-$(TOOL_OBJS): $(OBJ_DIR)/%.tool.o : src/%.tool.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.tool.o: src/%.tool.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -I$(GEN_DIR) -c $< -o $@
 $(TOOL_EXECS): $(BIN_DIR)/sk.% : $(OBJ_DIR)/%.tool.o | $(BIN_DIR)
 	$(CC) $(LDFLAGS) $^ -o $@ 
