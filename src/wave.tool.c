@@ -1,6 +1,11 @@
 #include "wave.cmdl.h"
 #include "generic_module.h"
-#include "cmads_modwave.h"
+
+#define MA_NO_DECODING
+#define MA_NO_ENCODING
+#define MA_NO_ENGINE
+#define MA_NO_NODE_GRAPH
+#define MA_NO_RESOURCE_MANAGER
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
