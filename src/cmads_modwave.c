@@ -4,6 +4,10 @@
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
+#ifndef M_PI
+#define M_PI 3.1415926535897932384626433832
+#endif
+
 //
 // Direct modwave functions
 // 
