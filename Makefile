@@ -24,6 +24,8 @@ all: toolchain
 # Phony target to build all tools
 .PHONY:
 toolchain: $(TOOL_EXECS) $(BIN_DIR)/sk.view
+.PHONY:
+toolchain-nosdl: $(TOOL_EXECS)
 
 # Phony target to enable debug compilation
 .PHONY:
