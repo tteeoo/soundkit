@@ -1,13 +1,16 @@
-- Make generic module have ability for processing
+- Codebase:
+	- Make generic module have ability for processing
+	- miniaudio.so?
 
-- Modules
+- Modules:
 	- Encoder
-	- Decoder 
+	- Envelope
+	- Compressor (ducking with IPC?)
 
-- Sequencer
+- Sequencer:
 	- Format: define commands (sounds) as characters, make text character grid of tracks and sounds
 
-- Arguments
+- Arguments:
 	- Volume control for each module
 	- Channel control for each module
 	- Lifetime control for each module
