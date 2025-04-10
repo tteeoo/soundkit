@@ -1,6 +1,7 @@
 version "0.1.0"
-package "soundkit - noise tool"
-purpose "Generate noise"
+package "noise"
+purpose "soundkit - noise tool: generate noise"
 
+text "\nTool options:"
 option "type" t "Noise type: white, pink, brownian" values="w","p","b" enum default="w" optional
 option "amplitude" a "Noise amplitude" float default="1.0" optional
