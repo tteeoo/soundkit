@@ -2,6 +2,6 @@ version "0.1.0"
 package "soundkit - wave tool"
 purpose "Generate waves"
 
-option "type" t "Wave type: sine, square, sawtooth" string values="sn","sq","sw" enum default="sn" optional
+option "type" t "Wave type: sine, square, sawtooth" values="sn","sq","sw" enum default="sn" optional
 option "frequency" f "Wave frequency" float required
 option "amplitude" a "Wave amplitude" float default="1.0" optional

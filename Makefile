@@ -55,12 +55,14 @@ $(OBJ_DIR)/%.cmdl.o: $(GEN_DIR)/%.cmdl.c $(GEN_DIR)/%.cmdl.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Specific tool dependencies
+$(OBJ_DIR)/decode.tool.o: | $(GEN_DIR)/decode.cmdl.h
 $(OBJ_DIR)/wave.tool.o: | $(GEN_DIR)/wave.cmdl.h
 $(OBJ_DIR)/noise.tool.o: | $(GEN_DIR)/noise.cmdl.h
+$(BIN_DIR)/sk.decode: $(OBJ_DIR)/decode.cmdl.o
 $(BIN_DIR)/sk.noise: $(OBJ_DIR)/noise.cmdl.o
 $(BIN_DIR)/sk.wave: $(OBJ_DIR)/wave.cmdl.o
 $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/cmads_modwave.o
-$(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_module.o 
+$(BIN_DIR)/sk.decode $(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_module.o 
 $(BIN_DIR)/sk.playback $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf $(BIN_DIR)/sk.encode: $(OBJ_DIR)/cmads_stdins.o
 
 # Generic tool compilation

@@ -1,0 +1,5 @@
+version "0.1.0"
+package "soundkit - decode tool"
+purpose "Read WAV files"
+
+option "path" p "File path to a WAV file for reading" string required
