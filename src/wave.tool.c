@@ -9,8 +9,6 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
-#define MA_NO_DECODING
-#define MA_NO_ENCODING
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
