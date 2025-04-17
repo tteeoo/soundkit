@@ -1,5 +1,5 @@
-#ifndef generic_module_h
-#define generic_module_h
+#ifndef generic_source_h
+#define generic_source_h
 
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"

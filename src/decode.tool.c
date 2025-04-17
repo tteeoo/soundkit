@@ -1,5 +1,5 @@
 #include "decode.cmdl.h"
-#include "generic_module.h"
+#include "generic_source.h"
 
 #define MA_NO_GENERATION
 #define MA_NO_ENCODING

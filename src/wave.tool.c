@@ -1,5 +1,5 @@
 #include "wave.cmdl.h"
-#include "generic_module.h"
+#include "generic_source.h"
 
 #define MA_NO_DECODING
 #define MA_NO_ENCODING

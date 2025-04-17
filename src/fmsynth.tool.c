@@ -1,4 +1,4 @@
-#include "generic_module.h"
+#include "generic_source.h"
 #include "cmads_modwave.h"
 
 #define MA_NO_GENERATION
