@@ -1,0 +1,6 @@
+version "0.1.0"
+package "envelope"
+purpose "soundkit - envelope tool: apply sound envelope"
+
+text "\nTool options:"
+option "attack" a "Attack time" float required

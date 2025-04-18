@@ -1,7 +1,3 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <unistd.h>
-
 #include <SDL.h>
 
 #include "generic_process.h"
@@ -25,7 +21,6 @@
 ma_result process_function(void* vRenderer, void* out, const void* in, ma_uint32 count) {
 
 	SDL_Renderer* renderer = (SDL_Renderer*)vRenderer;
-	float* data = (float*)in;
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
@@ -35,16 +30,23 @@ ma_result process_function(void* vRenderer, void* out, const void* in, ma_uint32
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
 
 	// Currently only defaults to the first channel
-	SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-	for (int i = 0; i < count - 1; i++) {
-		int x1 = (i * WIDTH) / count;
-		int x2 = ((i+1) * WIDTH) / count;
-		int y1 = HEIGHT/2 + (data[i*CHANNELS] * HEIGHT/2);
-		int y2 = HEIGHT/2 + (data[(i+1)*CHANNELS] * HEIGHT/2);
+	float* inFloat = (float*)in;
+	float* outFloat = (float*)out;
+	for (ma_uint32 iFrame = 0; iFrame < count - 1; iFrame++) {
+		int x1 = (iFrame * WIDTH) / count;
+		int x2 = ((iFrame+1) * WIDTH) / count;
+		int y1 = HEIGHT/2 + (inFloat[iFrame*CHANNELS] * HEIGHT/2);
+		int y2 = HEIGHT/2 + (inFloat[(iFrame+1)*CHANNELS] * HEIGHT/2);
 		SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
+		for (ma_uint32 iChannel = 0; iChannel < CHANNELS; iChannel++)
+			outFloat[iFrame*CHANNELS + iChannel] = inFloat[iFrame*CHANNELS + iChannel];
 	}
+	for (ma_uint32 iChannel = 0; iChannel < CHANNELS; iChannel++)
+		outFloat[(count-1)*CHANNELS + iChannel] = inFloat[(count-1)*CHANNELS + iChannel];
 
 	SDL_RenderPresent(renderer);
 
