@@ -13,18 +13,23 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 	cmads_stdins stdins;
 	cmads_stdins_init(&stdinsConfig, &stdins);
 
-	float s[channels * batch_size];
+	float in[channels * batch_size];
+	float out[channels * batch_size];
+	for (ma_uint32 i = 0; i < channels * batch_size; i++) {
+		in[i] = 0;
+		out[i] = 0;
+	}
 	while (1) {
 
-		ma_result result = ma_data_source_read_pcm_frames((ma_data_source*)&stdins, s, batch_size, NULL);
+		ma_result result = ma_data_source_read_pcm_frames((ma_data_source*)&stdins, in, batch_size, NULL);
 		if (result != MA_SUCCESS)
 			break;
 
-		result = process_function(process_struct, &s, &s, batch_size);
+		result = process_function(process_struct, &out, &in, batch_size);
 		if (result != MA_SUCCESS)
 			break;
 
-		write(1, &s, batch_size * sizeof(float) * channels);
+		write(1, &out, batch_size * sizeof(float) * channels);
 
 		sleep(batch_size / sample_rate);
 	}

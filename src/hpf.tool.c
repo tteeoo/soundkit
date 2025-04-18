@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <unistd.h>
-
 #include "generic_process.h"
 
 #define MA_NO_GENERATION
