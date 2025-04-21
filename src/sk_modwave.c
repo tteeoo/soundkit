@@ -29,7 +29,7 @@ void sk_modwave_read_pcm_frames(sk_modwave* pModWave, void* pFramesOut, ma_uint6
 		for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
 			pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
 
-		pModWave->time += 1.0 / pModWave->config.sampleRate;
+		pModWave->time += 1.0 / pModWave->config.sample_rate;
 	}
 
 	if (pFramesRead != NULL)
@@ -37,7 +37,7 @@ void sk_modwave_read_pcm_frames(sk_modwave* pModWave, void* pFramesOut, ma_uint6
 }
 
 void sk_modwave_seek_to_pcm_frame(sk_modwave* pModWave, ma_uint64 frameIndex) {
-	pModWave->time = (double)frameIndex / (double)pModWave->config.sampleRate;
+	pModWave->time = (double)frameIndex / (double)pModWave->config.sample_rate;
 }
 
 
@@ -58,9 +58,9 @@ static ma_result sk_modwave_on_get_data_format(ma_data_source* pDataSource, ma_f
 
 	sk_modwave* pModWave = (sk_modwave*)pDataSource;
 
-	*pFormat = pModWave->config.format;
+	*pFormat = ma_format_f32;
 	*pChannels = pModWave->config.channels;
-	*pSampleRate = pModWave->config.sampleRate;
+	*pSampleRate = pModWave->config.sample_rate;
 	ma_channel_map_init_standard(ma_standard_channel_map_default, pChannelMap, channelMapCap, pModWave->config.channels);
 
 	return MA_SUCCESS;
@@ -69,7 +69,7 @@ static ma_result sk_modwave_on_get_data_format(ma_data_source* pDataSource, ma_f
 static ma_result sk_modwave_on_get_cursor(ma_data_source* pDataSource, ma_uint64* pCursor) {
 
 	sk_modwave* pModWave = (sk_modwave*)pDataSource;
-	*pCursor = (ma_uint64)(pModWave->time * pModWave->config.sampleRate);
+	*pCursor = (ma_uint64)(pModWave->time * pModWave->config.sample_rate);
 	return MA_SUCCESS;
 }
 
@@ -79,21 +79,19 @@ static ma_data_source_vtable g_sk_modwave_vtable = {
 	sk_modwave_on_get_data_format,
 	sk_modwave_on_get_cursor,
 	NULL, // No get_length
-	NULL, // No set_looping (TODO?)
+	NULL, // No set_looping
 	0
 };
 
 //
 // struct init/uninit methods
 //
-sk_modwave_config sk_modwave_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency) {
+sk_modwave_config sk_modwave_config_init(ma_uint32 channels, ma_uint32 sample_rate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency) {
 
 	sk_modwave_config config;
-	//MA_ZERO_OBJECT(&config);
 
-	config.format = format;
 	config.channels = channels;
-	config.sampleRate = sampleRate;
+	config.sample_rate = sample_rate;
 	config.type = type;
 	config.camplitude = camplitude;
 	config.mamplitude = mamplitude;

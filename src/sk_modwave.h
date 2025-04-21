@@ -8,7 +8,6 @@
 // struct definitions
 //
 typedef struct {
-	ma_format format;
 	ma_uint32 channels;
 	ma_uint32 sampleRate;
 	ma_waveform_type type; // TODO: use mtype and ctype for waves
