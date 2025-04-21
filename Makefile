@@ -65,6 +65,7 @@ $(BIN_DIR)/sk.wave: $(OBJ_DIR)/wave.cmdl.o
 $(BIN_DIR)/sk.envelope: $(OBJ_DIR)/envelope.cmdl.o
 
 # Tool build dependencies
+$(BIN_DIR)/sk.envelope: $(OBJ_DIR)/sk_adsr.o
 $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/sk_modwave.o
 $(BIN_DIR)/sk.playback: $(OBJ_DIR)/sk_stdins.o
 $(BIN_DIR)/sk.decode $(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_source.o 

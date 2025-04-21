@@ -1,4 +1,5 @@
 #include "envelope.cmdl.h"
+#include "sk_adsr.h"
 #include "generic_process.h"
 
 #define MA_NO_GENERATION
@@ -15,28 +16,8 @@
 #define SAMPLE_RATE  48000
 #define BATCH_SIZE   100
 
-ma_result process_function(void* vEnvelope, void* out, const void* in, ma_uint32 count) {
-
-	static ma_uint32 i = 0;
-	float time = (float)(i * BATCH_SIZE) / (float)SAMPLE_RATE;
-
-	sk_envelope* envelope = (sk_envelope*) vEnvelope;
-	if (envelope->attack_time <= time)
-		envelope->attacking = 0;
-
-	float* inFloat = (float*)in;
-	float* outFloat = (float*)out;
-	for (ma_uint32 iFrame = 0; iFrame < count; iFrame++)
-		for (ma_uint32 iChannel = 0; iChannel < CHANNELS; iChannel++)
-			if (envelope->attacking)
-				outFloat[iFrame*CHANNELS + iChannel] = inFloat[iFrame*CHANNELS + iChannel] * (time / envelope->attack_time );
-			else
-				outFloat[iFrame*CHANNELS + iChannel] = inFloat[iFrame*CHANNELS + iChannel];
-		
-
-	i++;
-
-	return MA_SUCCESS;
+ma_result process_function(void* vADSR, void* out, const void* in, ma_uint32 count) {
+	return sk_adsr_process_pcm_frames((sk_adsr*)vADSR, out, in, count);
 }
 
 int main(int argc, char** argv) {
@@ -46,10 +27,13 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	sk_envelope envelope;
-	sk_envelope_init(&envelope, ai.attack_arg);
+	sk_adsr_config adsrConfig = sk_adsr_config_init(CHANNELS, SAMPLE_RATE,
+		ai.attack_arg, ai.decay_arg, ai.sustain_arg, ai.coeff_arg, ai.release_arg);
 
-	forward_data((void *)&envelope, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
+	sk_adsr adsr;
+	sk_adsr_init(&adsrConfig, &adsr);
+
+	forward_data((void *)&adsr, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
     
 	(void)argc;
 	return 0;
