@@ -1,17 +1,17 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "cmads_stdins.h"
+#include "sk_stdins.h"
 #include "generic_process.h"
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
 ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sample_rate, ma_uint32 batch_size) {
 
-	cmads_stdins_config stdinsConfig = cmads_stdins_config_init(ma_format_f32, channels, sample_rate);
+	sk_stdins_config stdinsConfig = sk_stdins_config_init(ma_format_f32, channels, sample_rate);
 
-	cmads_stdins stdins;
-	cmads_stdins_init(&stdinsConfig, &stdins);
+	sk_stdins stdins;
+	sk_stdins_init(&stdinsConfig, &stdins);
 
 	float in[channels * batch_size];
 	float out[channels * batch_size];
@@ -34,7 +34,7 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 		sleep(batch_size / sample_rate);
 	}
 
-	cmads_stdins_uninit(&stdins);
+	sk_stdins_uninit(&stdins);
 
 	return MA_SUCCESS;
 }

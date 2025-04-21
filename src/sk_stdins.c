@@ -1,18 +1,18 @@
 #include <unistd.h>
 
-#include "cmads_stdins.h"
+#include "sk_stdins.h"
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
 //
 // vtable bindings
 //
-static ma_result cmads_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
+static ma_result sk_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
 
 	//MA_ASSERT(pDataSource != NULL);
 	//MA_ASSERT(pFramesOut != NULL);
 
-	cmads_stdins* pStdins = (cmads_stdins*)pDataSource;
+	sk_stdins* pStdins = (sk_stdins*)pDataSource;
 
 	float s;
 	if (pStdins->config.format == ma_format_f32) {
@@ -32,9 +32,9 @@ static ma_result cmads_stdins_on_read(ma_data_source* pDataSource, void* pFrames
 	return MA_SUCCESS;
 }
 
-static ma_result cmads_stdins_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap) {
+static ma_result sk_stdins_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap) {
 
-	cmads_stdins* pStdins = (cmads_stdins*)pDataSource;
+	sk_stdins* pStdins = (sk_stdins*)pDataSource;
 
 	*pFormat = pStdins->config.format;
 	*pChannels = pStdins->config.channels;
@@ -44,10 +44,10 @@ static ma_result cmads_stdins_on_get_data_format(ma_data_source* pDataSource, ma
 	return MA_SUCCESS;
 }
 
-static ma_data_source_vtable g_cmads_stdins_vtable = {
-	cmads_stdins_on_read,
+static ma_data_source_vtable g_sk_stdins_vtable = {
+	sk_stdins_on_read,
 	NULL, // No seek
-	cmads_stdins_on_get_data_format,
+	sk_stdins_on_get_data_format,
 	NULL, // No cursor
 	NULL, // No get_length
 	NULL, // No set_looping
@@ -57,9 +57,9 @@ static ma_data_source_vtable g_cmads_stdins_vtable = {
 //
 // struct init/uninit methods
 //
-cmads_stdins_config cmads_stdins_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate) {
+sk_stdins_config sk_stdins_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate) {
 
-	cmads_stdins_config config;
+	sk_stdins_config config;
 	//MA_ZERO_OBJECT(&config);
 
 	config.format = format;
@@ -69,13 +69,13 @@ cmads_stdins_config cmads_stdins_config_init(ma_format format, ma_uint32 channel
 	return config;
 }
 
-ma_result cmads_stdins_init(cmads_stdins_config* pConfig, cmads_stdins* pStdins) {
+ma_result sk_stdins_init(sk_stdins_config* pConfig, sk_stdins* pStdins) {
 
 	ma_result result;
 	ma_data_source_config baseConfig;
 
 	baseConfig = ma_data_source_config_init();
-	baseConfig.vtable = &g_cmads_stdins_vtable;
+	baseConfig.vtable = &g_sk_stdins_vtable;
 
 	//MA_ZERO_OBJECT(pStdins);
 
@@ -91,7 +91,7 @@ ma_result cmads_stdins_init(cmads_stdins_config* pConfig, cmads_stdins* pStdins)
 	return MA_SUCCESS;
 }
 
-void cmads_stdins_uninit(cmads_stdins* pStdins) {
+void sk_stdins_uninit(sk_stdins* pStdins) {
 
 	if (pStdins == NULL)
 		return;

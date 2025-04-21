@@ -15,7 +15,7 @@ SDL_LDFLAGS := $(shell sdl2-config --libs)
 TOOL_EXECS := $(patsubst src/%.tool.c,$(BIN_DIR)/sk.%,$(wildcard src/*.tool.c))
 
 # Specify non-tool, non-command parser objects (with self-named headers)
-EXTRA_OBJS := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(wildcard src/cmads_*.c)) $(OBJ_DIR)/generic_source.o $(OBJ_DIR)/generic_process.o
+EXTRA_OBJS := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(wildcard src/sk_*.c)) $(OBJ_DIR)/generic_source.o $(OBJ_DIR)/generic_process.o
 
 # Default to toolchain
 .PHONY:
@@ -65,10 +65,10 @@ $(BIN_DIR)/sk.wave: $(OBJ_DIR)/wave.cmdl.o
 $(BIN_DIR)/sk.envelope: $(OBJ_DIR)/envelope.cmdl.o
 
 # Tool build dependencies
-$(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/cmads_modwave.o
-$(BIN_DIR)/sk.playback: $(OBJ_DIR)/cmads_stdins.o
+$(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/sk_modwave.o
+$(BIN_DIR)/sk.playback: $(OBJ_DIR)/sk_stdins.o
 $(BIN_DIR)/sk.decode $(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_source.o 
-$(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/cmads_stdins.o
+$(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/sk_stdins.o
 
 # Generic tool compilation
 $(OBJ_DIR)/%.tool.o: src/%.tool.c | $(OBJ_DIR)

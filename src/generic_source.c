@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "cmads_stdins.h"
+#include "sk_stdins.h"
 #include "generic_source.h"
 
 #undef MINIAUDIO_IMPLEMENTATION

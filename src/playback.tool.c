@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "cmads_stdins.h"
+#include "sk_stdins.h"
 
 #define MA_NO_GENERATION
 #define MA_NO_DECODING
@@ -35,8 +35,8 @@ int main(int argc, char** argv) {
 
 	ma_device device;
 	ma_device_config deviceConfig;
-	cmads_stdins stdins;
-	cmads_stdins_config stdinsConfig;
+	sk_stdins stdins;
+	sk_stdins_config stdinsConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
 	deviceConfig.playback.format   = FORMAT;
@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
 	if (isatty(1))
 		printf("Device Name: %s\n", device.playback.name);
 
-	stdinsConfig = cmads_stdins_config_init(device.playback.format, device.playback.channels, device.sampleRate);
-	cmads_stdins_init(&stdinsConfig, &stdins);
+	stdinsConfig = sk_stdins_config_init(device.playback.format, device.playback.channels, device.sampleRate);
+	sk_stdins_init(&stdinsConfig, &stdins);
 
 	if (ma_device_start(&device) != MA_SUCCESS) {
 		if (isatty(1)) 
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 	while(1);
 
 	ma_device_uninit(&device);
-	cmads_stdins_uninit(&stdins);
+	sk_stdins_uninit(&stdins);
 
 	(void)argc;
 	(void)argv;

@@ -15,17 +15,6 @@
 #define SAMPLE_RATE  48000
 #define BATCH_SIZE   100
 
-typedef struct {
-	float attack_time;
-	ma_bool8 attacking;
-} sk_envelope;
-
-static ma_result sk_envelope_init(sk_envelope* envelope, float attack_time) {
-	envelope->attack_time = attack_time;
-	envelope->attacking = 1;
-	return MA_SUCCESS;
-}
-
 ma_result process_function(void* vEnvelope, void* out, const void* in, ma_uint32 count) {
 
 	static ma_uint32 i = 0;
