@@ -10,7 +10,6 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
-#define FORMAT       ma_format_f32
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
 #define BATCH_SIZE   100
@@ -21,7 +20,7 @@ int main(int argc, char** argv) {
 	sk_modwave_config modWaveConfig;
 
 	// TODO: input validation, custom waveforms
-	modWaveConfig = sk_modwave_config_init(FORMAT, CHANNELS, SAMPLE_RATE, ma_waveform_type_sine,
+	modWaveConfig = sk_modwave_config_init(CHANNELS, SAMPLE_RATE, ma_waveform_type_sine,
 			atof(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 	sk_modwave_init(&modWaveConfig, &modWave);
 

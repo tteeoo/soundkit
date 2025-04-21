@@ -9,7 +9,7 @@
 //
 typedef struct {
 	ma_uint32 channels;
-	ma_uint32 sampleRate;
+	ma_uint32 sample_rate;
 	ma_waveform_type type; // TODO: use mtype and ctype for waves
 	double camplitude;
 	double mamplitude;
@@ -28,7 +28,7 @@ void sk_modwave_read_pcm_frames(sk_modwave* pModWave, void* pFramesOut, ma_uint6
 void sk_modwave_seek_to_pcm_frame(sk_modwave* pModWave, ma_uint64 frameIndex);
 
 // struct init/uninit methods
-sk_modwave_config sk_modwave_config_init(ma_format format, ma_uint32 channels, ma_uint32 sampleRate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency);
+sk_modwave_config sk_modwave_config_init(ma_uint32 channels, ma_uint32 sample_rate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency);
 ma_result sk_modwave_init(sk_modwave_config* pConfig, sk_modwave* pModWave);
 void sk_modwave_uninit(sk_modwave* pModWave);
 
