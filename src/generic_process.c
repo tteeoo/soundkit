@@ -29,7 +29,8 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 		if (result != MA_SUCCESS)
 			break;
 
-		write(1, &out, batch_size * sizeof(float) * channels);
+		if (write(1, &out, batch_size * sizeof(float) * channels) == -1)
+			break;
 
 		sleep(batch_size / sample_rate);
 	}

@@ -1,0 +1,6 @@
+version "0.1.0"
+package "encode"
+purpose "soundkit - encode tool: write WAV files"
+
+text "\nTool options:"
+option "path" p "File path to a WAV file for writing" string required

@@ -11,6 +11,9 @@ LDFLAGS     := -ldl -lpthread -lm
 SDL_CFLAGS  := $(shell sdl2-config --cflags)
 SDL_LDFLAGS := $(shell sdl2-config --libs)
 
+# Tools that depend on command-line parsers
+CMD_TOOLS := $(patsubst src/%.ggo,%,$(wildcard src/*.ggo))
+
 # Tool binaries (that don't depend on SDL)
 TOOL_EXECS := $(patsubst src/%.tool.c,$(BIN_DIR)/sk.%,$(wildcard src/*.tool.c))
 
@@ -55,21 +58,15 @@ $(OBJ_DIR)/%.cmdl.o: $(GEN_DIR)/%.cmdl.c $(GEN_DIR)/%.cmdl.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Tool command-line dependencies
-$(OBJ_DIR)/decode.tool.o: | $(GEN_DIR)/decode.cmdl.h
-$(OBJ_DIR)/wave.tool.o: | $(GEN_DIR)/wave.cmdl.h
-$(OBJ_DIR)/noise.tool.o: | $(GEN_DIR)/noise.cmdl.h
-$(OBJ_DIR)/envelope.tool.o: | $(GEN_DIR)/envelope.cmdl.h
-$(BIN_DIR)/sk.decode: $(OBJ_DIR)/decode.cmdl.o
-$(BIN_DIR)/sk.noise: $(OBJ_DIR)/noise.cmdl.o
-$(BIN_DIR)/sk.wave: $(OBJ_DIR)/wave.cmdl.o
-$(BIN_DIR)/sk.envelope: $(OBJ_DIR)/envelope.cmdl.o
+$(foreach tool,$(CMD_TOOLS),$(eval $(OBJ_DIR)/$(tool).tool.o: | $(GEN_DIR)/$(tool).cmdl.h))
+$(foreach tool,$(CMD_TOOLS),$(eval $(BIN_DIR)/sk.$(tool): $(OBJ_DIR)/$(tool).cmdl.o))
 
 # Tool build dependencies
 $(BIN_DIR)/sk.envelope: $(OBJ_DIR)/sk_adsr.o
 $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/sk_modwave.o
 $(BIN_DIR)/sk.playback: $(OBJ_DIR)/sk_stdins.o
 $(BIN_DIR)/sk.decode $(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_source.o 
-$(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/sk_stdins.o
+$(BIN_DIR)/sk.encode $(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/sk_stdins.o
 
 # Generic tool compilation
 $(OBJ_DIR)/%.tool.o: src/%.tool.c | $(OBJ_DIR)

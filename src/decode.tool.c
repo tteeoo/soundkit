@@ -21,10 +21,9 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	ma_decoder decoder;
-	ma_decoder_config decoderConfig;
+	ma_decoder_config decoderConfig = ma_decoder_config_init(FORMAT, CHANNELS, SAMPLE_RATE);
 
-	decoderConfig = ma_decoder_config_init(FORMAT, CHANNELS, SAMPLE_RATE);
+	ma_decoder decoder;
 	ma_decoder_init_file(ai.path_arg, &decoderConfig, &decoder);
 
 	if (isatty(1))

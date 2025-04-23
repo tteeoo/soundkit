@@ -1,6 +1,6 @@
 version "0.1.0"
 package "decode"
-purpose "soundkit - decode tool: read WAV files"
+purpose "soundkit - decode tool: read WAV, MP3, FLAC files"
 
 text "\nTool options:"
-option "path" p "File path to a WAV file for reading" string required
+option "path" p "File path to an audio file for reading" string required
