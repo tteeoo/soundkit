@@ -33,7 +33,6 @@ ma_encoder encoder;
 
 void intHandler(int sig) {
 	ma_encoder_uninit(&encoder);
-	dprintf(2, "OK\n");
 	(void)sig;
 }
 
