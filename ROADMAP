@@ -2,8 +2,6 @@
 	- miniaudio.so?
 
 - Modules:
-	- Encoder
-	- Envelope
 	- Compressor (ducking with IPC?)
 
 - Sequencer:
