@@ -8,3 +8,4 @@ option "decay" d "Attack time" float required
 option "sustain" s "Attack time" float required
 option "coeff" c "Sustain coefficient" float required
 option "release" r "Attack time" float required
+option "exponential" e "Use exponential decay/release" flag off

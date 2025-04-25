@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
 	}
 
 	sk_adsr_config adsrConfig = sk_adsr_config_init(CHANNELS, SAMPLE_RATE,
-		ai.attack_arg, ai.decay_arg, ai.sustain_arg, ai.coeff_arg, ai.release_arg);
+		ai.attack_arg, ai.decay_arg, ai.sustain_arg, ai.coeff_arg, ai.release_arg, (ma_bool8)ai.exponential_flag);
 
 	sk_adsr adsr;
 	sk_adsr_init(&adsrConfig, &adsr);
