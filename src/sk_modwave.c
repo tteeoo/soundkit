@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 
 #include "sk_modwave.h"
 #undef MINIAUDIO_IMPLEMENTATION
@@ -9,25 +10,93 @@
 #endif
 
 //
-// Direct modwave functions
-// 
-
-// Helper wave function
+// Helper wave functions
+//
 static float modwave_sinf(double time, double frequency, double phase, double amplitude) {
 	return (float)(sin(2 * M_PI * frequency * time + phase) * amplitude);
 }
 
+static float modwave_sawtooth(double time, double frequency, double phase, double amplitude) {
+	time *= frequency;
+	time += phase;
+
+	double f = time - (ma_int64)time;
+	double r;
+
+	r = 2 * (f - 0.5);
+
+	return (float)(r * amplitude);
+}
+
+static float modwave_square(double time, double frequency, double phase, double amplitude) {
+	time *= frequency;
+	time += phase;
+
+	double f = time - (ma_int64)time;
+	double r;
+
+	if (f < 0.5) {
+		r = amplitude;
+	} else {
+		r = -amplitude;
+	}
+
+	return (float)r;
+}
+
+static float modwave_triangle(double time, double frequency, double phase, double amplitude) {
+	time *= frequency;
+	time += phase;
+
+	double f = time - (ma_int64)time;
+	double r;
+
+	r = 2 * fabs(2 * (f - 0.5)) - 1;
+
+	return (float)(r * amplitude);
+}
+
+static float modwave(ma_waveform_type type, double time, double frequency, double phase, double amplitude) {
+	switch (type) {
+		case ma_waveform_type_sine:
+			return modwave_sinf(time, frequency, phase, amplitude);
+		case ma_waveform_type_square:
+			return modwave_square(time, frequency, phase, amplitude);
+		case ma_waveform_type_sawtooth:
+			return modwave_sawtooth(time, frequency, phase, amplitude);
+		case ma_waveform_type_triangle:
+			return modwave_triangle(time, frequency, phase, amplitude);
+		default:
+			return 0;
+	}
+}
+
+
+//
+// Direct modwave function
+//
 void sk_modwave_read_pcm_frames(sk_modwave* pModWave, void* pFramesOut, ma_uint64 frameCount, ma_uint64* pFramesRead) {
 
-	//MA_ASSERT(pModWave != NULL);
-	//MA_ASSERT(pFramesOut != NULL);
+	float pModFrames[pModWave->config.channels * frameCount];
+	if (pModWave->config.mod_source != NULL) {
+		ma_data_source_read_pcm_frames(pModWave->config.mod_source, pModFrames, frameCount, NULL);
+	}
 
 	float* pFramesOutF32 = (float*)pFramesOut;
 	for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
-		float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
-			modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
-		for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
-			pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
+		if (pModWave->config.mod_source == NULL) {
+			float s = modwave_sinf(pModWave->time, pModWave->config.cfrequency,
+				modwave_sinf(pModWave->time, pModWave->config.mfrequency, 0, pModWave->config.mamplitude), pModWave->config.camplitude);
+			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1)
+				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] = s;
+		} else {
+			for (ma_uint64 iChannel = 0; iChannel < pModWave->config.channels; iChannel += 1) {
+				pModWave->phaseAccum[iChannel] += pModFrames[iFrame*pModWave->config.channels + iChannel];
+				pFramesOutF32[iFrame*pModWave->config.channels + iChannel] =
+					modwave(pModWave->config.type, pModWave->time, pModWave->config.cfrequency,
+						(pModWave->config.mamplitude / 8.1169) * pModWave->phaseAccum[iChannel], pModWave->config.camplitude);
+			}
+		}
 
 		pModWave->time += 1.0 / pModWave->config.sample_rate;
 	}
@@ -86,7 +155,7 @@ static ma_data_source_vtable g_sk_modwave_vtable = {
 //
 // struct init/uninit methods
 //
-sk_modwave_config sk_modwave_config_init(ma_uint32 channels, ma_uint32 sample_rate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency) {
+sk_modwave_config sk_modwave_config_init(ma_uint32 channels, ma_uint32 sample_rate, ma_waveform_type type, double camplitude, double mamplitude, double cfrequency, double mfrequency, ma_data_source* mod_source) {
 
 	sk_modwave_config config;
 
@@ -97,6 +166,7 @@ sk_modwave_config sk_modwave_config_init(ma_uint32 channels, ma_uint32 sample_ra
 	config.mamplitude = mamplitude;
 	config.cfrequency = cfrequency;
 	config.mfrequency = mfrequency;
+	config.mod_source = mod_source;
 
 	return config;
 }
@@ -109,8 +179,6 @@ ma_result sk_modwave_init(sk_modwave_config* pConfig, sk_modwave* pModWave) {
 	baseConfig = ma_data_source_config_init();
 	baseConfig.vtable = &g_sk_modwave_vtable;
 
-	//MA_ZERO_OBJECT(pModWave);
-
 	result = ma_data_source_init(&baseConfig, &pModWave->base);
 	if (result != MA_SUCCESS)
 		return result;
@@ -121,6 +189,8 @@ ma_result sk_modwave_init(sk_modwave_config* pConfig, sk_modwave* pModWave) {
 	pModWave->config = *pConfig;
 	pModWave->time = 0;
 
+	pModWave->phaseAccum = (float*)calloc(pModWave->config.channels, sizeof(float));
+
 	return MA_SUCCESS;
 }
 
@@ -128,6 +198,8 @@ void sk_modwave_uninit(sk_modwave* pModWave) {
 
 	if (pModWave == NULL)
 		return;
+
+	free(pModWave->phaseAccum);
 
 	ma_data_source_uninit(&pModWave->base);
 }

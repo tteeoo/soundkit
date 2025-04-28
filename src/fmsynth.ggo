@@ -1,0 +1,10 @@
+version "0.1.0"
+package "fmsynth"
+purpose "soundkit - FM synth tool: waves with frequency modulation"
+
+text "\nTool options:"
+option "type" t "Wave type: sine, square, sawtooth, triangle" values="s","u","w","t" enum default="s" optional
+option "frequency" f "Wave frequency" float required
+option "amplitude" a "Wave amplitude" float default="1.0" optional
+option "mamplitude" m "Modulation amplitude" float default="1.0" optional
+option "mfrequency" s "Modulation frequency (sine wave only)" float default="0.0" optional
