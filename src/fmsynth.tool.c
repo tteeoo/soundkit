@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 			ai.amplitude_arg, ai.mamplitude_arg, ai.frequency_arg, ai.mfrequency_arg, (ma_data_source*)&stdins);
 	} else {
 		if (ai.mfrequency_arg == 0) {
-			dprintf(2, "Without a modulation source piped in, a modulation frequency (-s) must be specified\n");
+			fprintf(stderr, "Without a modulation source piped in, a modulation frequency (-s) must be specified\n");
 			exit(1);
 		}
 		modwaveConfig = sk_modwave_config_init(CHANNELS, SAMPLE_RATE, ma_waveform_type_sine,
