@@ -1,3 +1,4 @@
+#include "hpf.cmdl.h"
 #include "generic_process.h"
 
 #define MA_NO_GENERATION
@@ -14,13 +15,18 @@
 #define SAMPLE_RATE  48000
 #define BATCH_SIZE   100
 
-ma_result process_function(void* hpf,void* out,const void* in,ma_uint32 count) {
+ma_result process_function(void* hpf, void* out, const void* in, ma_uint32 count) {
 	return ma_hpf_process_pcm_frames((ma_hpf*)hpf, out, in, count);
 }
 
 int main(int argc, char** argv) {
 
-	ma_hpf_config hpfConfig = ma_hpf_config_init(FORMAT, CHANNELS, SAMPLE_RATE, SAMPLE_RATE / atof(argv[1]), atoi(argv[2]));
+	struct gengetopt_args_info ai;
+	if (cmdline_parser(argc, argv, &ai) != 0) {
+		exit(1);
+	}
+
+	ma_hpf_config hpfConfig = ma_hpf_config_init(FORMAT, CHANNELS, SAMPLE_RATE, ai.frequency_arg, ai.order_arg);
 
 	ma_hpf hpf;
 	ma_hpf_init(&hpfConfig, NULL, &hpf);

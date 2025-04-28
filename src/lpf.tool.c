@@ -1,3 +1,4 @@
+#include "lpf.cmdl.h"
 #include "generic_process.h"
 
 #define MA_NO_GENERATION
@@ -20,7 +21,12 @@ ma_result process_function(void* lpf, void* out, const void* in, ma_uint32 count
 
 int main(int argc, char** argv) {
 
-	ma_lpf_config lpfConfig = ma_lpf_config_init(FORMAT, CHANNELS, SAMPLE_RATE, SAMPLE_RATE / atof(argv[1]), atoi(argv[2]));
+	struct gengetopt_args_info ai;
+	if (cmdline_parser(argc, argv, &ai) != 0) {
+		exit(1);
+	}
+
+	ma_lpf_config lpfConfig = ma_lpf_config_init(FORMAT, CHANNELS, SAMPLE_RATE, ai.frequency_arg, ai.order_arg);
 
 	ma_lpf lpf;
 	ma_lpf_init(&lpfConfig, NULL, &lpf);

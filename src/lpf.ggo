@@ -1,0 +1,7 @@
+version "0.1.0"
+package "lpf"
+purpose "soundkit - lpf tool: Butterworth low-pass filter"
+
+text "\nTool options:"
+option "frequency" f "Cutoff frequency" float required
+option "order" o "Filter order" int default="4" optional
