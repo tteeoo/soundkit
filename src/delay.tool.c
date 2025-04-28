@@ -1,3 +1,4 @@
+#include "delay.cmdl.h"
 #include "generic_process.h"
 
 #define MA_NO_GENERATION
@@ -20,7 +21,12 @@ ma_result process_function(void* delay, void* out, const void* in, ma_uint32 cou
 
 int main(int argc, char** argv) {
 
-	ma_delay_config delayConfig = ma_delay_config_init(CHANNELS, SAMPLE_RATE, (ma_uint32)(SAMPLE_RATE * atof(argv[1])), atof(argv[2]));
+	struct gengetopt_args_info ai;
+	if (cmdline_parser(argc, argv, &ai) != 0) {
+		exit(1);
+	}
+
+	ma_delay_config delayConfig = ma_delay_config_init(CHANNELS, SAMPLE_RATE, (ma_uint32)(SAMPLE_RATE * ai.time_arg), ai.decay_arg);
 
 	ma_delay delay;
 	ma_delay_init(&delayConfig, NULL, &delay);

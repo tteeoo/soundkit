@@ -1,0 +1,7 @@
+version "0.1.0"
+package "delay"
+purpose "soundkit - delay tool: add echoing to input"
+
+text "\nTool options:"
+option "time" t "Time between delay reverberations (seconds)" float required
+option "decay" d "Decay factor of reverberations (1 = persistent, 0 = nonexistent)" float required
