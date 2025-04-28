@@ -23,14 +23,17 @@ int main(int argc, char** argv) {
 
 	ma_waveform_type type;
 	switch (ai.type_arg) {
-		case type_arg_sn:
+		case type_arg_s:
 			type = ma_waveform_type_sine;
 			break;
-		case type_arg_sq:
+		case type_arg_u:
 			type = ma_waveform_type_square;
 			break;
-		case type_arg_sw:
+		case type_arg_w:
 			type = ma_waveform_type_sawtooth;
+			break;
+		case type_arg_t:
+			type = ma_waveform_type_triangle;
 			break;
 		case type__NULL:
 			exit(1);
