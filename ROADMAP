@@ -4,7 +4,6 @@
 - Modules:
 	- fmsynth
 		- Useful for creating samples:
-			- modwave of sawtooth with reverse ramp
 			- initial phase offset
 	- Compressor (ducking with named pipe)
 
