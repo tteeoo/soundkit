@@ -7,9 +7,6 @@
 			- initial phase offset
 	- Compressor (ducking with named pipe)
 
-- Sequencer:
-	- Format: define commands (sounds) as characters, make text character grid of tracks and sounds
-
 - Arguments:
 	- Volume control for each module
 	- Channel control for each module

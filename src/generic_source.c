@@ -55,10 +55,10 @@ ma_result forward_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 samp
 	float s[channels * batch_size];
 	while (1) {
 		ma_result result = ma_data_source_read_pcm_frames(pData, s, batch_size, NULL);
-		if (result != MA_SUCCESS) {
+		if (result != MA_SUCCESS)
 			break;
-		}
-		write(1, &s, batch_size * sizeof(float) * channels);
+		if (write(1, &s, batch_size * sizeof(float) * channels) == -1)
+			break;
 		sleep(batch_size / sample_rate);
 	}
 
