@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "sk_grid.h"
 #undef MINIAUDIO_IMPLEMENTATION
@@ -19,6 +20,8 @@ static ma_result sk_grid_on_read(ma_data_source* pDataSource, void* pFramesOut, 
 	for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 		for (ma_uint64 iChannel = 0; iChannel < pGrid->config.channels; iChannel += 1) {
 			for (int iPipe = 0; iPipe < pGrid->config.count; iPipe++) {
+				/*if (read(pGrid->config.fds[iPipe][0], &s, sizeof(float)) == 0)*/
+				/*	continue;*/
 				read(pGrid->config.fds[iPipe][0], &s, sizeof(float));
 				outFloat[iFrame*pGrid->config.channels + iChannel] += s;
 			}
@@ -64,6 +67,9 @@ sk_grid_config sk_grid_config_init(ma_uint32 channels, ma_uint32 sampleRate, int
 	config.sampleRate = sampleRate;
 	config.fds = fds;
 	config.count = count;
+
+	/*for (int i = 0; i < count; i++)*/
+	/*	fcntl(fds[i][0], F_SETFL, fcntl(fds[i][0], F_GETFL) | O_NONBLOCK);*/
 
 	return config;
 }

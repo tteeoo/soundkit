@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 
 #include "sk_stdins.h"
 #undef MINIAUDIO_IMPLEMENTATION
@@ -15,12 +16,16 @@ static ma_result sk_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut
 	sk_stdins* pStdins = (sk_stdins*)pDataSource;
 
 	float s;
+	int broken = 0;
 	if (pStdins->config.format == ma_format_f32) {
 		float* pFramesOutF32 = (float*)pFramesOut;
 		for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 
 			for (ma_uint64 iChannel = 0; iChannel < pStdins->config.channels; iChannel += 1) {
-				read(0, &s, sizeof(float));
+				if (read(0, &s, sizeof(float)) == -1) {
+					broken = 1;
+					break;
+				}
 				pFramesOutF32[iFrame*pStdins->config.channels + iChannel] = s;
 			}
 		}
@@ -29,7 +34,7 @@ static ma_result sk_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut
 	if (pFramesRead != NULL)
 		*pFramesRead = frameCount;
 
-	return MA_SUCCESS;
+	return broken ? -1 : MA_SUCCESS;
 }
 
 static ma_result sk_stdins_on_get_data_format(ma_data_source* pDataSource, ma_format* pFormat, ma_uint32* pChannels, ma_uint32* pSampleRate, ma_channel* pChannelMap, size_t channelMapCap) {

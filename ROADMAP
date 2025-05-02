@@ -1,6 +1,13 @@
 - Codebase:
 	- miniaudio.so?
 
+- Rhythm Composer
+	- Not bug out when instrument unused
+	- Proper process management
+	- Allow single instrument to overlap
+	- Work with playback module
+	- Polyrhythms
+
 - Modules:
 	- fmsynth
 		- Useful for creating samples:

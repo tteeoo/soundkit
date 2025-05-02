@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	sk_adsr_init(&adsrConfig, &adsr);
 
 	forward_data((void *)&adsr, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
-    
+
 	(void)argc;
 	return 0;
 }

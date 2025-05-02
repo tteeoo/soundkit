@@ -65,7 +65,6 @@ int main(int argc, char** argv) {
 			char chars[100];
 			sscanf(line, "%u%s", &bpm, chars);
 			int nc = 0;
-			int i = 0;
 			for (int i = 0; chars[i] != '\0'; i++)
 				if (chars[i] == '-')
 					nc++;
@@ -93,7 +92,7 @@ int main(int argc, char** argv) {
 					exit(1);
 				}
 			}
-			for (int i = 1; i < len; i++) {
+			for (size_t i = 1; i < len; i++) {
 				if (line[i] == '|')
 					break;
 				char temp[2] = {line[i], '\0'};
@@ -104,45 +103,49 @@ int main(int argc, char** argv) {
 	fclose(rfp);
 	fprintf(stderr, "%f\n", 60 / cpm);
 
-	if (fork() == 0) {
-		sk_grid_config gridConfig = sk_grid_config_init(CHANNELS, SAMPLE_RATE, pipes, si);
-
-		sk_grid grid;
-		sk_grid_init(&gridConfig, &grid);
-
-
-		if (isatty(1))
-			playback_data((ma_data_source*)&grid, CHANNELS, SAMPLE_RATE);
-		else
-			forward_data((ma_data_source*)&grid, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
-
-		sk_grid_uninit(&grid);
-	}
-
 	// TODO signal handling to kill after ^C, also kill the above process
 	// - have as many proc storage for each signal as rlen, to allow overlap
 	// 	(but then sk_grid must have multiple inputs for each instrument)
 	// - Get working with sk.view
-	int procs[1000] = {0};
-	while (true) {
-		for (int i = 0; i < rlen; i++) {
-			for (int sj = 0; sj < si; sj++) {
-				if (strchr(rhythm[i], symbols[sj])) {
-					if (procs[sj] != 0) {
-						int e = killpg(procs[sj], 9);
-						if (e != 0)
-							perror("killing");
-					}
-					if ((procs[sj] = fork()) == 0) {
-						setpgid(0, 0);
-						dup2(pipes[sj][1], 1);
-						execlp("bash", "bash", "-c", signals[sj], NULL);
+	if (fork() == 0) {
+
+		int procs[1000] = {0};
+		while (true) {
+
+			for (int i = 0; i < rlen; i++) {
+				for (int sj = 0; sj < si; sj++) {
+
+					if (strchr(rhythm[i], symbols[sj])) {
+						if (procs[sj] != 0) {
+							int e = killpg(procs[sj], 9);
+							if (e != 0)
+								perror("killing");
+						}
+
+						if ((procs[sj] = fork()) == 0) {
+							setpgid(0, 0);
+							dup2(pipes[sj][1], 1);
+							execlp("bash", "bash", "-c", signals[sj], NULL);
+						}
 					}
 				}
+
+				precise_sleep(60 / cpm);
 			}
-			precise_sleep(60 / cpm);
 		}
 	}
+
+	sk_grid_config gridConfig = sk_grid_config_init(CHANNELS, SAMPLE_RATE, pipes, si);
+
+	sk_grid grid;
+	sk_grid_init(&gridConfig, &grid);
+
+	if (isatty(1))
+		playback_data((ma_data_source*)&grid, CHANNELS, SAMPLE_RATE);
+	else
+		forward_data((ma_data_source*)&grid, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
+
+	sk_grid_uninit(&grid);
 
 	return 0;
 }
