@@ -14,7 +14,7 @@
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   100
+#define BATCH_SIZE   1000
 
 ma_result process_function(void* vADSR, void* out, const void* in, ma_uint32 count) {
 	return sk_adsr_process_pcm_frames((sk_adsr*)vADSR, out, in, count);

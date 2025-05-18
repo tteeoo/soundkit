@@ -16,7 +16,7 @@
 
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   100
+#define BATCH_SIZE   1000
 
 int main(int argc, char** argv) {
 

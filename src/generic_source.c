@@ -52,6 +52,8 @@ ma_result playback_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 sam
 
 ma_result forward_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 sample_rate, ma_uint32 batch_size) {
 
+	setvbuf(stdout, NULL, _IONBF, 0);
+
 	float s[channels * batch_size];
 	while (1) {
 		ma_result result = ma_data_source_read_pcm_frames(pData, s, batch_size, NULL);
@@ -59,6 +61,7 @@ ma_result forward_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 samp
 			break;
 		if (write(1, &s, batch_size * sizeof(float) * channels) == -1)
 			break;
+		fsync(1);
 		sleep(batch_size / sample_rate);
 	}
 

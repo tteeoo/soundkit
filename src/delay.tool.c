@@ -13,7 +13,7 @@
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   100
+#define BATCH_SIZE   1000
 
 ma_result process_function(void* delay, void* out, const void* in, ma_uint32 count) {
 	return ma_delay_process_pcm_frames((ma_delay*)delay, out, in, count);

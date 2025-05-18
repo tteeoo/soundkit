@@ -8,6 +8,8 @@
 
 ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sample_rate, ma_uint32 batch_size) {
 
+	setvbuf(stdout, NULL, _IONBF, 0);
+
 	sk_stdins_config stdinsConfig = sk_stdins_config_init(ma_format_f32, channels, sample_rate);
 
 	sk_stdins stdins;
@@ -31,6 +33,7 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 
 		if (write(1, &out, batch_size * sizeof(float) * channels) == -1)
 			break;
+		fsync(1);
 
 		sleep(batch_size / sample_rate);
 	}

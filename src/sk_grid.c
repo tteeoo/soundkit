@@ -1,10 +1,23 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <errno.h>
+
+int get_pipe_bytes_available(int fd) {
+    int bytes_avail;
+    if (ioctl(fd, FIONREAD, &bytes_avail) == -1) {
+        perror("ioctl(FIONREAD) failed");
+        return -1;
+    }
+    return bytes_avail;
+}
 
 #include "sk_grid.h"
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
+float last [2000] = {0};
 //
 // vtable bindings
 //
@@ -19,10 +32,18 @@ static ma_result sk_grid_on_read(ma_data_source* pDataSource, void* pFramesOut, 
 	float* outFloat = (float*)pFramesOut;
 	for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 		for (ma_uint64 iChannel = 0; iChannel < pGrid->config.channels; iChannel += 1) {
+
 			for (int iPipe = 0; iPipe < pGrid->config.count; iPipe++) {
-				/*if (read(pGrid->config.fds[iPipe][0], &s, sizeof(float)) == 0)*/
-				/*	continue;*/
-				read(pGrid->config.fds[iPipe][0], &s, sizeof(float));
+				if (read(pGrid->config.fds[iPipe][0], &s, sizeof(float)) != sizeof(float)) {
+					/*printf("EMPTIES%d\n", iPipe);*/
+					s = last[iPipe*pGrid->config.channels + iChannel];
+				} else {
+					last[iPipe*pGrid->config.channels + iChannel] = s;
+				}
+				/*int bytes_ready = get_pipe_bytes_available(pGrid->config.fds[iPipe][0]);*/
+				/*printf("Pipe %d has %d bytes (%.1f samples) available\n", */
+				/*	iPipe, bytes_ready, (float)bytes_ready / sizeof(float));*/
+				/*read(pGrid->config.fds[iPipe][0], &s, sizeof(float));*/
 				outFloat[iFrame*pGrid->config.channels + iChannel] += s;
 			}
 		}
@@ -68,8 +89,8 @@ sk_grid_config sk_grid_config_init(ma_uint32 channels, ma_uint32 sampleRate, int
 	config.fds = fds;
 	config.count = count;
 
-	/*for (int i = 0; i < count; i++)*/
-	/*	fcntl(fds[i][0], F_SETFL, fcntl(fds[i][0], F_GETFL) | O_NONBLOCK);*/
+	for (int i = 0; i < count; i++)
+		fcntl(fds[i][0], F_SETFL, fcntl(fds[i][0], F_GETFL) | O_NONBLOCK);
 
 	return config;
 }

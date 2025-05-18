@@ -21,7 +21,7 @@
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   100
+#define BATCH_SIZE   1000
 
 void precise_sleep(double seconds) {
 	struct timespec req;
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	fclose(rfp);
-	fprintf(stderr, "%f\n", 60 / cpm);
+	fprintf(stderr, "timing:%f instruments:%d\n", 60 / cpm, si);
 
 	// TODO signal handling to kill after ^C, also kill the above process
 	// - have as many proc storage for each signal as rlen, to allow overlap
@@ -123,9 +123,10 @@ int main(int argc, char** argv) {
 						}
 
 						if ((procs[sj] = fork()) == 0) {
+							/*close(pipes[i][0]);*/
 							setpgid(0, 0);
 							dup2(pipes[sj][1], 1);
-							execlp("bash", "bash", "-c", signals[sj], NULL);
+							execlp("/bin/sh", "sh", "-c", signals[sj], NULL);
 						}
 					}
 				}
