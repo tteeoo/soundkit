@@ -39,8 +39,8 @@ ma_result process_function(void* vRenderer, void* out, const void* in, ma_uint32
 	for (ma_uint32 iFrame = 0; iFrame < count - 1; iFrame++) {
 		int x1 = (iFrame * WIDTH) / count;
 		int x2 = ((iFrame+1) * WIDTH) / count;
-		int y1 = HEIGHT/2 + (inFloat[iFrame*CHANNELS] * HEIGHT/2);
-		int y2 = HEIGHT/2 + (inFloat[(iFrame+1)*CHANNELS] * HEIGHT/2);
+		int y1 = HEIGHT/2 - (inFloat[iFrame*CHANNELS] * HEIGHT/2);
+		int y2 = HEIGHT/2 - (inFloat[(iFrame+1)*CHANNELS] * HEIGHT/2);
 		SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 		for (ma_uint32 iChannel = 0; iChannel < CHANNELS; iChannel++)
 			outFloat[iFrame*CHANNELS + iChannel] = inFloat[iFrame*CHANNELS + iChannel];

@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
 		}
 	}
 	close(fds[1]);
-	read(0, &one, sizeof(float));
 
 	forward_data((void *)&adsr, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
     
