@@ -24,7 +24,7 @@ sk_adsr_config sk_adsr_config_init(ma_uint32 channels, ma_uint32 sample_rate, fl
 
 ma_result sk_adsr_init(sk_adsr_config* pConfig, sk_adsr* adsr) {
 	adsr->config = *pConfig;
-	adsr->state = attack;
+	adsr->state = adsr->config.attack_time == 0 ? decay : attack;
 	adsr->frames = 0;
 	return MA_SUCCESS;
 }
