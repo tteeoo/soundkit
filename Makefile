@@ -63,11 +63,11 @@ $(foreach tool,$(CMD_TOOLS),$(eval $(BIN_DIR)/sk.$(tool): $(OBJ_DIR)/$(tool).cmd
 
 # Tool build dependencies
 $(BIN_DIR)/sk.rcomposer: $(OBJ_DIR)/sk_grid.o
-$(BIN_DIR)/sk.envelope: $(OBJ_DIR)/sk_adsr.o
+$(BIN_DIR)/sk.adsrgen $(BIN_DIR)/sk.envelope: $(OBJ_DIR)/sk_adsr.o
 $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/sk_modwave.o $(OBJ_DIR)/sk_stdins.o
 $(BIN_DIR)/sk.playback: $(OBJ_DIR)/sk_stdins.o
 $(BIN_DIR)/sk.rcomposer $(BIN_DIR)/sk.decode $(BIN_DIR)/sk.noise $(BIN_DIR)/sk.wave $(BIN_DIR)/sk.fmsynth: $(OBJ_DIR)/generic_source.o 
-$(BIN_DIR)/sk.negate $(BIN_DIR)/sk.encode $(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/sk_stdins.o
+$(BIN_DIR)/sk.adsrgen $(BIN_DIR)/sk.negate $(BIN_DIR)/sk.encode $(BIN_DIR)/sk.envelope $(BIN_DIR)/sk.view $(BIN_DIR)/sk.delay $(BIN_DIR)/sk.lpf $(BIN_DIR)/sk.hpf: $(OBJ_DIR)/generic_process.o $(OBJ_DIR)/sk_stdins.o
 
 # Generic tool compilation
 $(OBJ_DIR)/%.tool.o: src/%.tool.c | $(OBJ_DIR)

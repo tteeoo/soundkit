@@ -1,0 +1,11 @@
+version "0.1.0"
+package "adsrgen"
+purpose "soundkit - adsr generator tool: output ADSR signals"
+
+text "\nTool options:"
+option "attack" a "Attack time" float required
+option "decay" d "Attack time" float required
+option "sustain" s "Attack time" float required
+option "coeff" c "Sustain coefficient" float required
+option "release" r "Attack time" float required
+option "exponential" e "Use exponential decay/release" flag off
