@@ -103,10 +103,11 @@ int main(int argc, char** argv) {
 	fclose(rfp);
 	fprintf(stderr, "timing:%f instruments:%d\n", 60 / cpm, si);
 
-	// TODO signal handling to kill after ^C, also kill the above process
+	// TODO
+	// - synchronization
+	// - signal handling to kill all processes after ^C
 	// - have as many proc storage for each signal as rlen, to allow overlap
 	// 	(but then sk_grid must have multiple inputs for each instrument)
-	// - Get working with sk.view
 	if (fork() == 0) {
 
 		int procs[1000] = {0};

@@ -24,7 +24,7 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 	MA_ASSERT(pDevice->pUserData != NULL);
 
 	ma_data_source_read_pcm_frames(pDevice->pUserData, pOutput, frameCount, NULL);
-	
+
 	if (!isatty(1))
 		write(1, pOutput, frameCount * sizeof(float) * CHANNELS);
 

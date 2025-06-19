@@ -32,7 +32,7 @@ static ma_result sk_grid_on_read(ma_data_source* pDataSource, void* pFramesOut, 
 	float* outFloat = (float*)pFramesOut;
 	for (ma_uint64 iFrame = 0; iFrame < frameCount; iFrame += 1) {
 		for (ma_uint64 iChannel = 0; iChannel < pGrid->config.channels; iChannel += 1) {
-
+			outFloat[iFrame*pGrid->config.channels + iChannel] = 0;
 			for (int iPipe = 0; iPipe < pGrid->config.count; iPipe++) {
 				if (read(pGrid->config.fds[iPipe][0], &s, sizeof(float)) != sizeof(float)) {
 					/*printf("EMPTIES%d\n", iPipe);*/

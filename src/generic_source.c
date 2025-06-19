@@ -61,7 +61,6 @@ ma_result forward_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 samp
 			break;
 		if (write(1, &s, batch_size * sizeof(float) * channels) == -1)
 			break;
-		fsync(1);
 		sleep(batch_size / sample_rate);
 	}
 
