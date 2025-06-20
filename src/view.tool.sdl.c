@@ -14,8 +14,8 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
 
-#define WIDTH        800
-#define HEIGHT       400
+#define WIDTH        1200
+#define HEIGHT       600
 #define BUFFER_SIZE  20000
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
