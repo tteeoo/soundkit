@@ -24,13 +24,6 @@
 
 ma_pcm_rb ring_buffer;
 
-void precise_sleep(double seconds) {
-	struct timespec req;
-	req.tv_sec = (time_t)seconds;
-	req.tv_nsec = (long)((seconds - (time_t)seconds) * 1e9);
-	nanosleep(&req, NULL);
-}
-
 void render(SDL_Renderer* renderer) {
 
 	ma_uint32 frameCount;

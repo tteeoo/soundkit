@@ -4,7 +4,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
-#include <time.h>
 
 #include "generic_source.h"
 #include "sk_grid.h"
@@ -22,13 +21,6 @@
 #define CHANNELS     2
 #define SAMPLE_RATE  48000
 #define BATCH_SIZE   1000
-
-void precise_sleep(double seconds) {
-	struct timespec req;
-	req.tv_sec = (time_t)seconds;
-	req.tv_nsec = (long)((seconds - (time_t)seconds) * 1e9);
-	nanosleep(&req, NULL);
-}
 
 int main(int argc, char** argv) {
 

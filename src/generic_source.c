@@ -1,11 +1,19 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "sk_stdins.h"
 #include "generic_source.h"
 
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
+
+void precise_sleep(double seconds) {
+	struct timespec req;
+	req.tv_sec = (time_t)seconds;
+	req.tv_nsec = (long)((seconds - (time_t)seconds) * 1e9);
+	nanosleep(&req, NULL);
+}
 
 static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
 
@@ -61,7 +69,7 @@ ma_result forward_data(ma_data_source* pData, ma_uint32 channels, ma_uint32 samp
 			break;
 		if (write(1, &s, batch_size * sizeof(float) * channels) == -1)
 			break;
-		sleep(batch_size / sample_rate);
+		precise_sleep(0.5 * (double)batch_size / (double)sample_rate);
 	}
 
 	return MA_SUCCESS;

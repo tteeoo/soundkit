@@ -1,10 +1,18 @@
 #include <unistd.h>
+#include <time.h>
 #include <stdio.h>
 
 #include "sk_stdins.h"
 #include "generic_process.h"
 #undef MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio/miniaudio.h"
+
+void precise_sleep(double seconds) {
+	struct timespec req;
+	req.tv_sec = (time_t)seconds;
+	req.tv_nsec = (long)((seconds - (time_t)seconds) * 1e9);
+	nanosleep(&req, NULL);
+}
 
 ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sample_rate, ma_uint32 batch_size) {
 
@@ -35,7 +43,7 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 			break;
 		fsync(1);
 
-		sleep(batch_size / sample_rate);
+		precise_sleep(0.5 * (double)batch_size / (double)sample_rate);
 	}
 
 	sk_stdins_uninit(&stdins);
