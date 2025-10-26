@@ -2,7 +2,7 @@
 #include <signal.h>
 
 #include "encode.cmdl.h"
-#include "generic_process.h"
+#include "../generic_process.h"
 
 #define MA_NO_GENERATION
 #define MA_NO_FLAC
@@ -11,7 +11,7 @@
 #define MA_NO_NODE_GRAPH
 #define MA_NO_RESOURCE_MANAGER
 #define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio/miniaudio.h"
+#include "../../miniaudio/miniaudio.h"
 
 #define FORMAT       ma_format_f32
 #define CHANNELS     2

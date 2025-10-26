@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "sk_stdins.h"
+#include "../sk_stdins.h"
 
 #define MA_NO_GENERATION
 #define MA_NO_DECODING
@@ -11,7 +11,7 @@
 #define MA_NO_RESOURCE_MANAGER
 #define MINIAUDIO_IMPLEMENTATION
 #define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio/miniaudio.h"
+#include "../../miniaudio/miniaudio.h"
 
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
