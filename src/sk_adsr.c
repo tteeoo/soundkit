@@ -74,8 +74,10 @@ ma_result sk_adsr_process_pcm_frames(sk_adsr* pADSR, void* out, const void* in, 
 			case release:
 				// TODO: in mode above, release loops to attack when done
 				if (pADSR->config.attack_time + pADSR->config.decay_time + pADSR->config.sustain_time + pADSR->config.release_time < time) {
-					ma_data_source_uninit(pADSR);
-					return MA_AT_END;
+					for (ma_uint32 iChannel = 0; iChannel < pADSR->config.channels; iChannel++)
+						outFloat[iFrame*pADSR->config.channels + iChannel] = NAN;
+					/*ma_data_source_uninit(pADSR);*/
+					/*return MA_AT_END;*/
 				}
 				else if (!pADSR->config.exponential)
 					for (ma_uint32 iChannel = 0; iChannel < pADSR->config.channels; iChannel++)

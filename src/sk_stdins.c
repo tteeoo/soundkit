@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "sk_stdins.h"
 #undef MINIAUDIO_IMPLEMENTATION
@@ -26,6 +27,9 @@ static ma_result sk_stdins_on_read(ma_data_source* pDataSource, void* pFramesOut
 					broken = 1;
 					break;
 				}
+				// Protect against adsr's nan end signal
+				if (isnan(s))
+					s = 0;
 				pFramesOutF32[iFrame*pStdins->config.channels + iChannel] = s;
 			}
 		}
