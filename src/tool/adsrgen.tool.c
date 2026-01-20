@@ -25,7 +25,7 @@ ma_result process_function(void* vADSR, void* out, const void* in, ma_uint32 cou
 }
 
 void* stdin_ones_thread(void* vfd) {
-  int fd = (int)vfd;
+	int fd = (int)vfd;
 	float one = 1;
 	while (1) {
 		for (int i = 0; i < BATCH_SIZE*CHANNELS; i++)
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
 	pipe(fds);
 	dup2(fds[0], 0);
 
-	pthread_t t = NULL;
+	pthread_t t;
 	pthread_create(&t, NULL, stdin_ones_thread, (void*)fds[1]);
 
 	forward_data((void *)&adsr, CHANNELS, SAMPLE_RATE, BATCH_SIZE);

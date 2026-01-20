@@ -1,7 +1,5 @@
-// TODO: killing the processes: adsrgin pid[0] not getting killed
-// frame drops, might be related to v
-// use atomics correctly for mixer stuff
-// able to put into view
+// TODO:
+// drops in audio playback (not mixed frames)
 
 #define _POSIX_C_SOURCE 200809L
 #define _GNU_SOURCE
