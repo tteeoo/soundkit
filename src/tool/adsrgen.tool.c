@@ -4,6 +4,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <pthread.h>
 
 #define MA_NO_GENERATION
 #define MA_NO_DECODING
@@ -23,6 +24,17 @@ ma_result process_function(void* vADSR, void* out, const void* in, ma_uint32 cou
 	return sk_adsr_process_pcm_frames((sk_adsr*)vADSR, out, in, count);
 }
 
+void* stdin_ones_thread(void* vfd) {
+  int fd = (int)vfd;
+	float one = 1;
+	while (1) {
+		for (int i = 0; i < BATCH_SIZE*CHANNELS; i++)
+			if (write(fd, &one, sizeof(float)) == -1)
+				break;
+		sleep(BATCH_SIZE / SAMPLE_RATE);
+	}
+}
+
 int main(int argc, char** argv) {
 
 	struct gengetopt_args_info ai;
@@ -38,17 +50,9 @@ int main(int argc, char** argv) {
 	int fds[2];
 	pipe(fds);
 	dup2(fds[0], 0);
-	if (fork() == 0) {
-		close(fds[0]);
-		float one = 1;
-		while (1) {
-			for (int i = 0; i < BATCH_SIZE*CHANNELS; i++)
-				if (write(fds[1], &one, sizeof(float)) == -1)
-					break;
-			sleep(BATCH_SIZE / SAMPLE_RATE);
-		}
-	}
-	close(fds[1]);
+
+	pthread_t t = NULL;
+	pthread_create(&t, NULL, stdin_ones_thread, (void*)fds[1]);
 
 	forward_data((void *)&adsr, CHANNELS, SAMPLE_RATE, BATCH_SIZE);
     
