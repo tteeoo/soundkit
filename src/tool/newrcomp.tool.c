@@ -21,6 +21,8 @@
 
 #include <sys/uio.h>
 
+#include "newrcomp.cmdl.h"
+
 #define MA_NO_GENERATION
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
@@ -37,6 +39,8 @@
 
 #define MAX_SOUNDS 256
 #define MAX_CHAIN_LEN 32
+
+int verbose = 0;
 
 typedef struct {
 	char *string;
@@ -83,7 +87,6 @@ void precise_sleep(double seconds) {
 	nanosleep(&req, NULL);
 }
 
-// pipe_launcher.c
 int execute_signal_chain(signal_chain* pSound) {
 	char* chain_copy = strdup(pSound->string);
 	char* saveptr = NULL;
@@ -314,14 +317,16 @@ void* mixer_thread(void* arg) {
 			break;
 		}
 
-		for (int i = 0; i < current_active; i++) {
-			if (pMixer->pfds[i].revents) {
-				   dprintf(2, "FD %d: revents = ", pMixer->pfds[i].fd);
-				   if (pMixer->pfds[i].revents & POLLIN) dprintf(2, "POLLIN ");
-				   if (pMixer->pfds[i].revents & POLLHUP) dprintf(2, "POLLHUP ");
-				   if (pMixer->pfds[i].revents & POLLERR) dprintf(2, "POLLERR ");
-				   if (pMixer->pfds[i].revents & POLLNVAL) dprintf(2, "POLLNVAL ");
-				   dprintf(2, "\n");
+		if (verbose) {
+			for (int i = 0; i < current_active; i++) {
+				if (pMixer->pfds[i].revents) {
+					   fprintf(stderr, "FD %d: revents = ", pMixer->pfds[i].fd);
+					   if (pMixer->pfds[i].revents & POLLIN) fprintf(stderr, "POLLIN ");
+					   if (pMixer->pfds[i].revents & POLLHUP) fprintf(stderr, "POLLHUP ");
+					   if (pMixer->pfds[i].revents & POLLERR) fprintf(stderr, "POLLERR ");
+					   if (pMixer->pfds[i].revents & POLLNVAL) fprintf(stderr, "POLLNVAL ");
+					   fprintf(stderr, "\n");
+				}
 			}
 		}
 
@@ -335,9 +340,11 @@ void* mixer_thread(void* arg) {
 					memset(pMixer->temp_buffer, 0, BATCH_SIZE*CHANNELS*sizeof(float));
 					ssize_t frames = read_pipe_zero_copy(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
 
-					dprintf(2,"strumenti:%d\n", frames);
-					if (frames != BATCH_SIZE)
-						printf("DROP\n");
+					if (verbose) {
+						fprintf(stderr,"strumenti:%d\n", frames);
+						if (frames != BATCH_SIZE)
+							printf("DROP\n");
+					}
 
 					if (frames > 0) {
 						for (ssize_t iFrame = 0; iFrame < frames; iFrame++) {
@@ -355,13 +362,13 @@ void* mixer_thread(void* arg) {
 							}
 						}
 					} else if (frames == 0 || (frames == -1 && errno != EAGAIN)) {
-						dprintf(2, "--pipe err--\n");
+						fprintf(stderr, "--pipe err--\n");
 						// Pipe closed or error
 						stop_sound_pipe(pMixer, i);//
 						i--;  // Adjust index after removal
 					}
 				} else if (pMixer->pfds[i].revents & POLLHUP) {
-					dprintf(2, "--pollhup--\n");
+					fprintf(stderr, "--pollhup--\n");
 					stop_sound_pipe(pMixer, i);//
 					i--;  // Adjust index after removal
 				}
@@ -378,7 +385,7 @@ void* mixer_thread(void* arg) {
 		size_t sizeInBytes = BATCH_SIZE*CHANNELS*sizeof(float);
 		ma_rb_acquire_write(pMixer->output_rb, &sizeInBytes, &pBuffer);
 		memcpy(pBuffer, pMixer->mix_buffer, sizeInBytes);
-		//dprintf(2, "%d\n", sizeInBytes);
+		//fprintf(stderr, "%d\n", sizeInBytes);
 
 		ma_rb_commit_write(pMixer->output_rb, sizeInBytes);
 			
@@ -468,23 +475,27 @@ static void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
 	ma_rb_acquire_read(pRB, &sizeInBytes, &pBuffer);
 	memcpy(pOutput, pBuffer, sizeInBytes);
 	ma_rb_commit_read(pRB, sizeInBytes);
-	if(!isatty(1))
+	if (!isatty(1))
 		write(1, pOutput, sizeInBytes);
-	dprintf(2, "-----------dc:%d\n", frameCount);
+	if (verbose)
+		fprintf(stderr, "-----------dc:%d\n", frameCount);
 
 	(void)pInput;
 }
 
 int main(int argc, char** argv) {
 
-	if (argc != 2) {
-		fprintf(stderr, "Usage: threaded_mixer <rhythm file>\n");
+	// Get args
+	struct gengetopt_args_info ai;
+	if (cmdline_parser(argc, argv, &ai) != 0) {
 		exit(1);
 	}
+	if (ai.verbose_flag)
+		verbose = 1;
 
-	FILE* rfp = fopen(argv[1], "r");
+	FILE* rfp = fopen(ai.path_arg, "r");
 	if (!rfp) {
-		perror("Error opening rhythm file");
+		perror("Error opening SKR track file");
 		exit(1);
 	}
 
@@ -543,26 +554,27 @@ int main(int argc, char** argv) {
 	fclose(rfp);
 	fprintf(stderr, "timing:%f instruments:%d\n", 60 / t.cpm, t.si);
 
+	// Create mixer and ring buffer
 	threaded_mixer mixer = { 0 };
 	ma_rb rb;
 	ma_rb_init(2 * SAMPLE_RATE * CHANNELS * sizeof(float), NULL, NULL, &rb);
 	mixer.output_rb = &rb;
 
+	// Create rcomposer
 	rcomposer r;
 	r.pMixer = &mixer;
 	r.track_info = t;
 
+	// Init mutexes
 	pthread_mutex_init(&mixer.mutex, NULL);
 	pthread_cond_init(&mixer.new_sound_cond, NULL);
+	atomic_store(&r.sequencer_running, 1);
+	atomic_store(&mixer.running, 1);
 	
 	// Create threads
 	pthread_t mixer_tid, sequencer_tid;
-
-	atomic_store(&r.sequencer_running, 1);
-	atomic_store(&mixer.running, 1);
 	pthread_create(&sequencer_tid, NULL, sequencer_thread, &r);
 	pthread_create(&mixer_tid, NULL, mixer_thread, &mixer);
-
 
 	ma_device device;
 	ma_device_config deviceConfig;
@@ -575,7 +587,7 @@ int main(int argc, char** argv) {
 	deviceConfig.pUserData = &rb;
 
 	if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
-		printf("Failed to open playback device.\n");
+		fprintf(stderr, "Failed to open playback device.\n");
 		return -4;
 	}
 
@@ -584,13 +596,13 @@ int main(int argc, char** argv) {
 
 	if (ma_device_start(&device) != MA_SUCCESS) {
 		if (isatty(1)) 
-			printf("Failed to start playback device.\n");
+			fprintf(stderr, "Failed to start playback device.\n");
 		ma_device_uninit(&device);
 		return -5;
 	}
 
 	if (isatty(1))
-		printf("Press key to quit...\n");
+		printf("Press enter to quit...\n");
 	getchar();
 
 	atomic_store(&r.sequencer_running, 0);

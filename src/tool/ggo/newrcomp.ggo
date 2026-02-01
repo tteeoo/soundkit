@@ -1,0 +1,7 @@
+version "0.1.0"
+package "newrcomp"
+purpose "soundkit - rhythm composer: sequencing and mixing from file"
+
+text "\nTool options:"
+option "path" p "Path for SKR track file" string required
+option "verbose" v "Verbose output for debugging" flag off
