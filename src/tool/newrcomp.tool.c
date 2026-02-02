@@ -35,7 +35,7 @@
 #define FORMAT	   float
 #define CHANNELS	 2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   1000
+#define BATCH_SIZE   500
 
 #define MAX_SOUNDS 256
 #define MAX_CHAIN_LEN 32
@@ -310,7 +310,7 @@ void* mixer_thread(void* arg) {
 		
 		// Poll all active pipe ends
 		/*int ready = poll(pMixer->pfds, pMixer->active_count, timeout_ms);*/
-		int ready = poll(pMixer->pfds, current_active, ((double)BATCH_SIZE / (double)SAMPLE_RATE) * 1000 * 2);
+		int ready = poll(pMixer->pfds, current_active, 0);
 		
 		// Check poll error
 		if (ready == -1) {
@@ -419,6 +419,7 @@ void parse_skr(track* t) {
 	int gathering = 1;
 	t->cpm = -1;
 	t->rlen = -1;
+	t->si = 0;
 
 	while ((read = getline(&line, &len, rfp)) != -1) {
 		if (line[0] == '#' || line[0] == ' ' || line[0] == '\n' || len == 1)
