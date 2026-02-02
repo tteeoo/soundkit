@@ -66,6 +66,7 @@ typedef struct {
 } threaded_mixer;
 
 typedef struct {
+	char* file_path;
 	char symbols[1000];
 	char* signals[1000];
 	char** rhythm;
@@ -404,8 +405,76 @@ void* mixer_thread(void* arg) {
 	return NULL;
 }
 
+void parse_skr(track* t) {
+
+	FILE* rfp = fopen(t->file_path, "r");
+	if (!rfp) {
+		perror("Error opening SKR track file");
+		exit(1);
+	}
+
+	char* line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	int gathering = 1;
+	t->cpm = -1;
+	t->rlen = -1;
+
+	while ((read = getline(&line, &len, rfp)) != -1) {
+		if (line[0] == '#' || line[0] == ' ' || line[0] == '\n' || len == 1)
+			continue;
+		if (line[0] == '|')
+			gathering = 0;
+		if (t->cpm == -1) {
+			unsigned int bpm;
+			char chars[100];
+			sscanf(line, "%u%s", &bpm, chars);
+			int nc = 0;
+			for (int i = 0; chars[i] != '\0'; i++)
+				if (chars[i] == '-')
+					nc++;
+			if (nc == 0)
+				nc = 1;
+			t->cpm = (float)bpm * (float)nc;
+		} else if (gathering) {
+			t->signals[t->si] = (char*)malloc(sizeof(char) * (len-1));
+			t->symbols[t->si] = line[0];
+			strcat(t->signals[t->si], &line[2]);
+			t->signals[t->si][strlen(t->signals[t->si])-1] = '\0';
+			fprintf(stderr, "%c %s\n", t->symbols[t->si], t->signals[t->si]);
+			t->si++;
+		} else {
+			if (t->rlen == -1) {
+				t->rlen = strchr(&line[1], '|') - line - 1;
+				t->rhythm = (char**)malloc(sizeof(char*) * t->rlen);
+				for (int i = 0; i < t->rlen; i++) {
+					t->rhythm[i] = (char*)malloc(sizeof(char) * 1000);
+				}
+			} else {
+				if (strchr(&line[1], '|') - line - 1 != t->rlen) {
+					fprintf(stderr, "Rhythm length mismatch\n");
+					exit(1);
+				}
+			}
+			for (size_t i = 1; i < len; i++) {
+				if (line[i] == '|')
+					break;
+				char temp[2] = {line[i], '\0'};
+				strcat(t->rhythm[i-1], temp);
+			}
+		}
+	}
+	fclose(rfp);
+	fprintf(stderr, "timing:%f instruments:%d\n", 60 / t->cpm, t->si);
+}
+
 void* sequencer_thread(void* arg) {
 	rcomposer* r = (rcomposer*)arg;
+
+	struct stat s;
+	stat(r->track_info.file_path, &s);
+	time_t mtime = s.st_mtime;
+
 	while (atomic_load(&r->sequencer_running)) {
 
 		for (int i = 0; i < r->track_info.rlen; i++) {
@@ -461,6 +530,12 @@ void* sequencer_thread(void* arg) {
 			}
 
 			precise_sleep(60 / r->track_info.cpm);
+
+			stat(r->track_info.file_path, &s);
+			if (s.st_mtime > mtime) {
+				mtime = s.st_mtime;
+				parse_skr(&r->track_info);
+			}
 		}
 	}
 
@@ -493,66 +568,10 @@ int main(int argc, char** argv) {
 	if (ai.verbose_flag)
 		verbose = 1;
 
-	FILE* rfp = fopen(ai.path_arg, "r");
-	if (!rfp) {
-		perror("Error opening SKR track file");
-		exit(1);
-	}
-
-	char* line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	int gathering = 1;
+	// Create track, parsing file
 	track t = { 0 };
-	t.cpm = -1;
-	t.rlen = -1;
-
-	while ((read = getline(&line, &len, rfp)) != -1) {
-		if (line[0] == '#' || line[0] == ' ' || line[0] == '\n' || len == 1)
-			continue;
-		if (line[0] == '|')
-			gathering = 0;
-		if (t.cpm == -1) {
-			unsigned int bpm;
-			char chars[100];
-			sscanf(line, "%u%s", &bpm, chars);
-			int nc = 0;
-			for (int i = 0; chars[i] != '\0'; i++)
-				if (chars[i] == '-')
-					nc++;
-			if (nc == 0)
-				nc = 1;
-			t.cpm = (float)bpm * (float)nc;
-		} else if (gathering) {
-			t.signals[t.si] = (char*)malloc(sizeof(char) * (len-1));
-			t.symbols[t.si] = line[0];
-			strcat(t.signals[t.si], &line[2]);
-			t.signals[t.si][strlen(t.signals[t.si])-1] = '\0';
-			fprintf(stderr, "%c %s\n", t.symbols[t.si], t.signals[t.si]);
-			t.si++;
-		} else {
-			if (t.rlen == -1) {
-				t.rlen = strchr(&line[1], '|') - line - 1;
-				t.rhythm = (char**)malloc(sizeof(char*) * t.rlen);
-				for (int i = 0; i < t.rlen; i++) {
-					t.rhythm[i] = (char*)malloc(sizeof(char) * 1000);
-				}
-			} else {
-				if (strchr(&line[1], '|') - line - 1 != t.rlen) {
-					fprintf(stderr, "Rhythm length mismatch\n");
-					exit(1);
-				}
-			}
-			for (size_t i = 1; i < len; i++) {
-				if (line[i] == '|')
-					break;
-				char temp[2] = {line[i], '\0'};
-				strcat(t.rhythm[i-1], temp);
-			}
-		}
-	}
-	fclose(rfp);
-	fprintf(stderr, "timing:%f instruments:%d\n", 60 / t.cpm, t.si);
+	t.file_path = ai.path_arg;
+	parse_skr(&t);
 
 	// Create mixer and ring buffer
 	threaded_mixer mixer = { 0 };
