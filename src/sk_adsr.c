@@ -39,7 +39,7 @@ ma_result sk_adsr_process_pcm_frames(sk_adsr* pADSR, void* out, const void* in, 
 		time = (float)(pADSR->frames + iFrame) / (float)pADSR->config.sample_rate;
 		switch (pADSR->state) {
 			case attack:
-				if (pADSR->config.attack_time < time)
+				if (pADSR->config.attack_time <= time)
 					pADSR->state++;
 				else {
 					for (ma_uint32 iChannel = 0; iChannel < pADSR->config.channels; iChannel++)
@@ -48,7 +48,7 @@ ma_result sk_adsr_process_pcm_frames(sk_adsr* pADSR, void* out, const void* in, 
 					break;
 				}
 			case decay:
-				if (pADSR->config.attack_time + pADSR->config.decay_time < time)
+				if (pADSR->config.attack_time + pADSR->config.decay_time <= time)
 					pADSR->state++;
 				else {
 					if (!pADSR->config.exponential)
@@ -63,7 +63,7 @@ ma_result sk_adsr_process_pcm_frames(sk_adsr* pADSR, void* out, const void* in, 
 				}
 			case sustain:
 				// TODO: responsive mode listens for silence, sustain_time not set
-				if (pADSR->config.attack_time + pADSR->config.decay_time + pADSR->config.sustain_time < time)
+				if (pADSR->config.attack_time + pADSR->config.decay_time + pADSR->config.sustain_time <= time)
 					pADSR->state++;
 				else {
 					for (ma_uint32 iChannel = 0; iChannel < pADSR->config.channels; iChannel++)
@@ -73,7 +73,7 @@ ma_result sk_adsr_process_pcm_frames(sk_adsr* pADSR, void* out, const void* in, 
 				}
 			case release:
 				// TODO: in mode above, release loops to attack when done
-				if (pADSR->config.attack_time + pADSR->config.decay_time + pADSR->config.sustain_time + pADSR->config.release_time < time) {
+				if (pADSR->config.attack_time + pADSR->config.decay_time + pADSR->config.sustain_time + pADSR->config.release_time <= time) {
 					for (ma_uint32 iChannel = 0; iChannel < pADSR->config.channels; iChannel++)
 						outFloat[iFrame*pADSR->config.channels + iChannel] = NAN;
 					/*ma_data_source_uninit(pADSR);*/
