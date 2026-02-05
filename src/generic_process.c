@@ -43,7 +43,9 @@ ma_result forward_data(void* process_struct, ma_uint32 channels, ma_uint32 sampl
 
 		if (write(1, &out, batch_size * sizeof(float) * channels) == -1)
 			break;
+#ifdef __linux__
 		fsync(1);
+#endif
 
 		precise_sleep(0.5 * (double)batch_size / (double)sample_rate);
 	}
