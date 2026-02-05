@@ -344,7 +344,7 @@ void* mixer_thread(void* arg) {
 					memset(pMixer->temp_buffer, 0, BATCH_SIZE*CHANNELS*sizeof(float));
 #ifdef __linux__
 					ssize_t frames = read_pipe_vmsplice(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
-#elif
+#else
 					ssize_t frames = read_pipe_audio(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
 #endif
 
