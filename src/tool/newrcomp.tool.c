@@ -35,7 +35,7 @@
 #define FORMAT	   float
 #define CHANNELS	 2
 #define SAMPLE_RATE  48000
-#define BATCH_SIZE   500
+#define BATCH_SIZE   1000
 
 #define MAX_SOUNDS 256
 #define MAX_CHAIN_LEN 32
@@ -186,17 +186,18 @@ int execute_signal_chain(signal_chain* pSound) {
 	return 1;
 }
 
+#ifdef __linux__
 // Efficient pipe reading using vmsplice for zero-copy
-ssize_t read_pipe_zero_copy(int pipefd, float *buffer, size_t frames) {
+ssize_t read_pipe_vmsplice(int pipefd, float *buffer, size_t frames) {
 	struct iovec iov = {
 		.iov_base = buffer,
 		.iov_len = frames * CHANNELS * sizeof(float)  // Stereo
 	};
-	
+
 	// vmsplice transfers data from user memory to pipe (or vice versa)
 	// without copying through kernel buffers
 	ssize_t bytes = vmsplice(pipefd, &iov, 1, SPLICE_F_NONBLOCK);
-	
+
 	if (bytes > 0) {
 		// Data was "spliced" directly into our buffer
 		return bytes / (CHANNELS * sizeof(float));  // Return frame count
@@ -205,7 +206,7 @@ ssize_t read_pipe_zero_copy(int pipefd, float *buffer, size_t frames) {
 	// Fallback to normal read
 	return read(pipefd, buffer, frames * CHANNELS * sizeof(float)) / (CHANNELS * sizeof(float));
 }
-
+#endif
 
 ssize_t read_pipe_audio(int pipefd, float *buffer, size_t max_frames) {
 	// Try to read complete buffers to reduce syscalls
@@ -237,23 +238,25 @@ void stop_sound_pipe(threaded_mixer* mixer, int index) {
 
 	pthread_mutex_lock(&mixer->mutex);
 
-	if (index < 0 || index >= mixer->active_count) return;
-	
 	signal_chain* pSound = &mixer->sounds[index];
+		dprintf(2, "stopper, %s\n", pSound->string);
+	if (index < 0 || index >= mixer->active_count) return;
+
+		dprintf(2, "noret, %s\n", pSound->string);
+	
+	// signal_chain* pSound = &mixer->sounds[index];
 	
 	// Kill all processes in the pipe chain
 	for (int i = 0; (i < MAX_CHAIN_LEN) && (pSound->pids[i] > 0); i++) {
 		if (kill(pSound->pids[i], SIGTERM) == 0) {
 			// Give process a chance to exit cleanly
 			int status;
-			waitpid(pSound->pids[i], &status, WNOHANG);
-			
-			// Force kill if still running
-			/*usleep(10000);  // 10ms grace period*/
-			if (waitpid(pSound->pids[i], &status, WNOHANG) == 0) {
-				kill(pSound->pids[i], SIGKILL);
-				waitpid(pSound->pids[i], &status, 0);
-			}
+			// // Force kill if still running
+			// usleep(10000);  // 10ms grace period
+			// if (waitpid(pSound->pids[i], &status, WNOHANG) == 0) {
+			// 	kill(pSound->pids[i], SIGKILL);
+			// 	waitpid(pSound->pids[i], &status, 0);
+			// }
 		}
 	}
 
@@ -339,7 +342,11 @@ void* mixer_thread(void* arg) {
 					
 					// Read audio data
 					memset(pMixer->temp_buffer, 0, BATCH_SIZE*CHANNELS*sizeof(float));
-					ssize_t frames = read_pipe_zero_copy(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
+#ifdef __linux__
+					ssize_t frames = read_pipe_vmsplice(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
+#elif
+					ssize_t frames = read_pipe_audio(pMixer->pfds[i].fd, pMixer->temp_buffer, BATCH_SIZE);
+#endif
 
 					if (verbose) {
 						fprintf(stderr,"strumenti:%d\n", frames);
@@ -580,7 +587,7 @@ int main(int argc, char** argv) {
 	ma_rb_init(2 * SAMPLE_RATE * CHANNELS * sizeof(float), NULL, NULL, &rb);
 	mixer.output_rb = &rb;
 
-	// Create rcomposer
+	// Create rcomposeor
 	rcomposer r;
 	r.pMixer = &mixer;
 	r.track_info = t;
@@ -600,6 +607,7 @@ int main(int argc, char** argv) {
 	ma_device_config deviceConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
+	deviceConfig.periodSizeInFrames = BATCH_SIZE;
 	deviceConfig.playback.format   = ma_format_f32;
 	deviceConfig.playback.channels = CHANNELS;
 	deviceConfig.sampleRate = SAMPLE_RATE;
