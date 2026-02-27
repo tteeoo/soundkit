@@ -1,6 +1,3 @@
-// TODO:
-// drops in audio playback (not mixed frames)
-
 #define _POSIX_C_SOURCE 200809L
 #define _GNU_SOURCE
 
@@ -239,25 +236,12 @@ void stop_sound_pipe(threaded_mixer* mixer, int index) {
 	pthread_mutex_lock(&mixer->mutex);
 
 	signal_chain* pSound = &mixer->sounds[index];
-		dprintf(2, "stopper, %s\n", pSound->string);
 	if (index < 0 || index >= mixer->active_count) return;
-
-		dprintf(2, "noret, %s\n", pSound->string);
-	
-	// signal_chain* pSound = &mixer->sounds[index];
 	
 	// Kill all processes in the pipe chain
 	for (int i = 0; (i < MAX_CHAIN_LEN) && (pSound->pids[i] > 0); i++) {
-		if (kill(pSound->pids[i], SIGTERM) == 0) {
-			// Give process a chance to exit cleanly
-			int status;
-			// // Force kill if still running
-			// usleep(10000);  // 10ms grace period
-			// if (waitpid(pSound->pids[i], &status, WNOHANG) == 0) {
-			// 	kill(pSound->pids[i], SIGKILL);
-			// 	waitpid(pSound->pids[i], &status, 0);
-			// }
-		}
+		if (index < 0 || index >= mixer->active_count) return;
+		kill(pSound->pids[i], SIGKILL);
 	}
 
 	// Close pipe file descriptor
@@ -602,6 +586,16 @@ int main(int argc, char** argv) {
 	pthread_t mixer_tid, sequencer_tid;
 	pthread_create(&sequencer_tid, NULL, sequencer_thread, &r);
 	pthread_create(&mixer_tid, NULL, mixer_thread, &mixer);
+
+	// Do away with zombie processes, getting rid of the need for waitpid()
+	struct sigaction sa;
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_NOCLDWAIT;
+	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+			perror("sigaction failed");
+			exit(1);
+	}
 
 	ma_device device;
 	ma_device_config deviceConfig;
