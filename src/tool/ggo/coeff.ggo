@@ -1,0 +1,6 @@
+version "0.1.0"
+package "coeff"
+purpose "soundkit - coeff tool: multiply signal by coefficient"
+
+text "\nTool options:"
+option "coeff" c "Multiple" float required

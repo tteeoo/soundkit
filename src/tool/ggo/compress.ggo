@@ -1,0 +1,6 @@
+version "0.1.0"
+package "compress"
+purpose "soundkit - compress tool: limit volume"
+
+text "\nTool options:"
+option "threshhold" t "Maximum volume" float required

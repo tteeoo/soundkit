@@ -1,0 +1,45 @@
+#include "coeff.cmdl.h"
+#include "../generic_process.h"
+
+#include <math.h>
+
+#define MA_NO_GENERATION
+#define MA_NO_DECODING
+#define MA_NO_ENCODING
+#define MA_NO_ENGINE
+#define MA_NO_NODE_GRAPH
+#define MA_NO_RESOURCE_MANAGER
+#define MINIAUDIO_IMPLEMENTATION
+#include "../../miniaudio/miniaudio.h"
+
+#define FORMAT       ma_format_f32
+#define CHANNELS     2
+#define SAMPLE_RATE  48000
+#define BATCH_SIZE   1000
+
+ma_result process_function(void* data, void* out, const void* in, ma_uint32 count) {
+
+	float* inFloat = (float*)in;
+	float* outFloat = (float*)out;
+	float* coeff = (float*)data;
+	for (ma_uint32 iFrame = 0; iFrame < count; iFrame++)
+		for (ma_uint32 iChannel = 0; iChannel < CHANNELS; iChannel++)
+				outFloat[CHANNELS*iFrame + iChannel] = inFloat[CHANNELS*iFrame + iChannel] * (*coeff);
+
+	(void)data;
+	return MA_SUCCESS;
+}
+
+int main(int argc, char** argv) {
+
+	struct gengetopt_args_info ai;
+	if (cmdline_parser(argc, argv, &ai) != 0) {
+		exit(1);
+	}
+
+	forward_data((void*)&(ai.coeff_arg), CHANNELS, SAMPLE_RATE, BATCH_SIZE);
+    
+	(void)argc;
+	(void)argv;
+	return 0;
+}
