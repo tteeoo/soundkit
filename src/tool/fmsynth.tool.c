@@ -1,7 +1,7 @@
 #include "fmsynth.cmdl.h"
-#include "generic_source.h"
-#include "sk_stdins.h"
-#include "sk_modwave.h"
+#include "../generic_source.h"
+#include "../sk_stdins.h"
+#include "../sk_modwave.h"
 
 #include <stdio.h>
 
@@ -12,7 +12,7 @@
 #define MA_NO_NODE_GRAPH
 #define MA_NO_RESOURCE_MANAGER
 #define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio/miniaudio.h"
+#include "../../miniaudio/miniaudio.h"
 
 #define CHANNELS     2
 #define SAMPLE_RATE  48000

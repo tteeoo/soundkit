@@ -1,3 +1,6 @@
+#define _XOPEN_SOURCE 500
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,8 +8,8 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "generic_source.h"
-#include "sk_grid.h"
+#include "../generic_source.h"
+#include "../sk_grid.h"
 
 #define MA_NO_GENERATION
 #define MA_NO_DECODING
@@ -15,7 +18,7 @@
 #define MA_NO_NODE_GRAPH
 #define MA_NO_RESOURCE_MANAGER
 #define MINIAUDIO_IMPLEMENTATION
-#include "../miniaudio/miniaudio.h"
+#include "../../miniaudio/miniaudio.h"
 
 #define FORMAT       ma_format_f32
 #define CHANNELS     2
@@ -103,7 +106,7 @@ int main(int argc, char** argv) {
 	if (fork() == 0) {
 
 		int procs[1000] = {0};
-		while (true) {
+		while (1) {
 
 			for (int i = 0; i < rlen; i++) {
 				for (int sj = 0; sj < si; sj++) {

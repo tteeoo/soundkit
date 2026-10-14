@@ -1,0 +1,11 @@
+version "0.1.0"
+package "envelope"
+purpose "soundkit - envelope tool: apply sound envelope"
+
+text "\nTool options:"
+option "attack" a "Attack time" float default="0.0" optional
+option "decay" d "Attack time" float default="0.0" optional
+option "sustain" s "Attack time" float default="0.0" optional
+option "coeff" c "Sustain coefficient" float default="0.5" optional
+option "release" r "Attack time" float default="0.0" optional
+option "exponential" e "Use exponential decay/release" flag off
