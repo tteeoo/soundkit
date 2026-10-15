@@ -1,0 +1,18 @@
+120--
+
+% ./sk.wave -tw -f.222 | ./sk.fmsynth -tw -f1 | ./sk.fmsynth -f100 -a1 -m0.05 | ./sk.compress -t.3 | ./sk.coeff -c2 | ./sk.delay -t.1 -d.9 | ./sk.lpf -f 120 | ./sk.envelope -s8
+O ./sk.adsrgen -a0 -d.18 -s1 -r0 -c0.2 | ./sk.fmsynth -m.1 -f 20 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5
+8 ./sk.fmsynth -f 60 -s 40 | ./sk.envelope -a.03 -d.1 -s.1 -r.1 -c.3
+y ./sk.noise -tw -a.5 | ./sk.envelope -a.005 -d.1 -s.05 -r.2 -c.3 -e | ./sk.hpf -f5000 -o8 | ./sk.delay -d.4 -t.05 | ./sk.envelope -s.25
+z ./sk.noise -a.5 -tb | ./sk.envelope -a.2 -d0 -s0 -r.1 -e -c0 | ./sk.hpf -f1000 -o8 | ./sk.envelope -s.4
+u ./sk.wave -tu -f300 -a.2 | ./sk.hpf -f3000 -o8 | ./sk.envelope -a.002 -d0 -s.1 -c1 -r.1
+( ./sk.wave -tw -f 7 | ./sk.fmsynth -a.3 -tu -f540 -m.1 | ./sk.compress -t.8 | ./sk.envelope -a.6 -d.4 -c.2 -s.4 -r.4
+) ./sk.wave -tw -f 10 | ./sk.fmsynth -a.3 -tu -f140 -m.1 | ./sk.compress -t.8 | ./sk.envelope -a.6 -d.4 -c.2 -s.4 -r.4
+
+#|       |       |       |       |       |       |       |
+|%                                                               |
+|          u         u              )                     (      |
+|         z         z                                            |
+|O O     O O     O O     O O     O O     O O     O O     O O     |
+|     8 8     8 8     8 8     8 8     8 8     8 8     8 8     8 8|
+| y yy y  y yy y  y yy y  y yy y  y yy y  y yy y  y yy y  y yy y |
