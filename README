@@ -6,10 +6,10 @@ A musical instrument consisting of
 a liberating series of sound tools for a UNIX environment.
 
 Compile from minimal C code to small, standalone binaries.
-
 Construct signal chains with pipes on the command line.
-
 Compose rhythms with signal chains in text files.
+
+Needs GNU Gengetopt to compile.
 
 Public domain.
 
