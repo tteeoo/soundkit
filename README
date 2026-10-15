@@ -2,7 +2,14 @@
 soundkit
 ========
 
-A liberating series of sound tools.
+A musical instrument consisting of
+a liberating series of sound tools for a UNIX environment.
+
+Compile from minimal C code to small, standalone binaries.
+
+Construct signal chains with pipes on the command line.
+
+Compose rhythms with signal chains in text files.
 
 Public domain.
 
@@ -11,10 +18,25 @@ modules
 -------
 
 Sources:
-* fmsynth <carrier amplitude> <modulator amplitude> <carrier frq> <modulator frq>
+* adsrgen
+* decode
+* fmsynth
+* noise
+* wave
 
-Intermediaries:
-* delay <seconds> <decay>
+Filters
+* coeff
+* compress
+* delay
+* envelope
+* hpf
+* lpf
+* negate
 
-Finality:
+Pass-throughs:
+* encode
+* view
+
+Hosts:
+* newrcomp
 * playback

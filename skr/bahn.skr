@@ -1,0 +1,10 @@
+120----
+
+b ./sk.noise | ./sk.fmsynth -tw -f2 -m.01 | ./sk.negate | ./sk.fmsynth -m.05 -f20 | ./sk.envelope -a.01 -d.05 -s.05 -r.05 -c.5
+p ./sk.noise -tb | ./sk.envelope -a.005 -d.1 -s.05 -r.5 -c.1 | ./sk.hpf -f6000 -o8 | ./sk.delay -d0.3 -t0.06
+c ./sk.noise -a.25 | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f1000 -o8 | ./sk.delay -d0.1 -t0.1
+
+#|               |               |               |               |
+|bb  b   b   b   bb  b   b   b   bb  b   b   b   bb  b   b   b   bb  b   b   b   |
+|                p p p p p p p p p   p p p p p p p p p p p p p p p p p p p p p p |
+|                                     c cc            c cc                       |

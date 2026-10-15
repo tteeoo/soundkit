@@ -1,0 +1,25 @@
+136----
+
+# kick
+O ./sk.adsrgen -a0 -d.18 -s1 -r0 -c0.2 | ./sk.fmsynth -m.1 -f 20 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5
+# bass
+8 ./sk.fmsynth -f 20 -s 40 | ./sk.envelope -a.03 -d.1 -s.1 -r.1 -c.3
+
+# hihat
+x ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f4000 -o8 | ./sk.delay -d0.1 -t0.1 | ./sk.envelope -a.000001 -d0.00000001 -s.25 -r0.25 -c1
+#z ./sk.noise -a.5 -tb | ./sk.envelope -a.2 -d0 -s0 -r.1 -e -c0 | ./sk.hpf -f1000 -o8
+# clap
+W ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f1000 -o8 | ./sk.delay -d0.1 -t0.1 | ./sk.envelope -a0.0000001 -d0.000000001 -s.25 -r0.25 -c1
+# zap
+u ./sk.wave -tt -f800 -a.1 | ./sk.hpf -f1000 -o8 | ./sk.envelope -a.002 -d0 -s.1 -c1 -r.1
+
+#b ./sk.decode -p ~/Downloads/bb_mo_dnb_breaks/Breakbeat\ Paradise\ Sample\ -\ Mo\ Drum\ n\ Bass\ Breaks\ 05.mp3 | ./sk.hpf -f360 | ./sk.delay -t.25 -d.15 | ./sk.fmsynth -tu -m10 -f50 -a.3
+
+
+#|               |               |               |               |
+| 8   8           8   8           8   8                   8   8      8    8      |
+|  x   x   x   x   x   x   x   x   x   x xxxx xx x x   x   x   x   x   x   x   x |
+| W W                                                             WWW            |
+#|b               b               b                           b                   |
+|         u  u        u   u  u        u                   u  u        u   u  u   |
+|O   O   O   O   O   O   O   O   O   O   O       O   O   O   O   O   O   O   O   |

@@ -1,0 +1,34 @@
+120----
+
+# kick
+O ./sk.adsrgen -a0 -d.18 -s1 -r0 -c0.2 | ./sk.fmsynth -m.1 -f 20 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5
+# bass
+8 ./sk.fmsynth -f 60 -s 40 | ./sk.envelope -a.03 -d.1 -s.1 -r.1 -c.3 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c2
+
+# hihat
+x ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f4000 -o8 | ./sk.delay -d0.1 -t0.1 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c1
+z ./sk.noise -a.5 -tb | ./sk.envelope -a.2 -d0 -s0 -r.1 -e -c0 | ./sk.hpf -f1000 -o8 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c1
+# clap
+W ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f1000 -o8 | ./sk.delay -d0.1 -t0.1 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c1
+# zap
+u ./sk.wave -tt -f800 -a.1 | ./sk.hpf -f1000 -o8 | ./sk.envelope -a.002 -d0 -s.1 -c1 -r.1
+
+p ./sk.wave -tw -f1 | ./sk.negate | ./sk.fmsynth -m.05 -f80 | ./sk.fmsynth -m.1 -f 160 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5 | ./sk.delay -t.1 -d.2 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c1
+b ./sk.wave -tw -f1 | ./sk.negate | ./sk.fmsynth -m.05 -f60 | ./sk.fmsynth -m.1 -f 120 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5 | ./sk.delay -t.1 -d.2 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c1
+q ./sk.wave -tw -f1 | ./sk.negate | ./sk.fmsynth -m.05 -f100 | ./sk.fmsynth -m.1 -f 480 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5 | ./sk.delay -t.1 -d.2 | ./sk.envelope -a.0000000000001 -d.000000000000001 -s1 -r.0000000000000001 -c.5
+
+
+#|O       O   O   |
+#|    W W W       |
+#|        u       |
+#|q               |
+#| 8   8   8   8  |
+#|               |               |               |               |
+|O   O   O   O   O   O   O   O   O   O   O   O   O   O   O   O       O   O   O   |
+| 8   8           8   8           8   8                   8   8      8    8      |
+|  x   x   x   x   x   x   x   x   x   x  xxx x x  x   x   x   x   x   x   x   x |
+| W W                                                             WWW            |
+|                      z   z  zz     z                               z   z z     |
+|         u  u        u   u  u        u                               u   u  u   |
+|        p  p        p   p  p        p                   p  p        p   p  p    |
+|        b  b        b   b  b        b                   b  b        b   b  b    |

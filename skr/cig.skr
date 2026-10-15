@@ -1,0 +1,25 @@
+64----
+
+# kick
+O ./sk.adsrgen -a0 -d.18 -s1 -r0 -c0.2 | ./sk.fmsynth -m.1 -f 20 | ./sk.envelope -a.001 -d.05 -s.05 -r.05 -c.5
+# bass
+9 ./sk.wave -tt -f40 | ./sk.fmsynth -m.01 -f20 -tt | ./sk.lpf -f70 | ./sk.envelope -a.1 -d.1 -s.3 -r.1 -c.6
+1 ./sk.wave -tt -f80 | ./sk.fmsynth -m.01 -f40 -tt | ./sk.lpf -f70 | ./sk.envelope -a.1 -d.1 -s.3 -r.1 -c.6
+
+# hihat
+x ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f4000 -o8 | ./sk.delay -d0.1 -t0.1
+#y ./sk.noise -tb | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f4000 -o8 | ./sk.delay -d0.5 -t0.07
+y ./sk.noise -tw -a.5 | ./sk.envelope -a.005 -d.1 -s.05 -r.2 -c.3 -e | ./sk.hpf -f5000 -o8 | ./sk.delay -d.4 -t.05
+#z ./sk.noise -a.5 -tb | ./sk.envelope -a.2 -d0 -s0 -r.1 -e -c0 | ./sk.hpf -f1000 -o8
+# clap
+W ./sk.noise -tp | ./sk.envelope -a.005 -d.1 -s.05 -r.1 -c.1 | ./sk.hpf -f1000 -o8 | ./sk.delay -d0.1 -t0.1
+# zap
+#u ./sk.wave -tu -f300 -a.2 | ./sk.hpf -f3000 -o8 | ./sk.envelope -a.002 -d0 -s.1 -c1 -r.1
+#q ./sk.noise -tb | ./sk.fmsynth -m1 -ts -f1000 | ./sk.envelope -a.07 -d.05 -s.03 -r.2 -c.7 | ./sk.hpf -f2400 -o8 | ./sk.delay -t.2 -d.1
+
+#|               |               |               |               |
+|O 1 O 1 O   O 1 O 1 O 1 O 1 O   O 1 O 1 O 1 O 1 O   O 1 O 1 O 1 O 1 O   O 1 O 1 |
+|9    9    9    9    9    9    9    9    9    9    9    9    9    9    9    9    |
+|  x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x |
+|                y y y y y y y y y y y y y y y y                                 |
+|     y y y W               WW W            W               WW W y y y       yyy |
